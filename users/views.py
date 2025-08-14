@@ -11,11 +11,13 @@ from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
+
 class RegisterView(generics.CreateAPIView):
     """
     Register endpoint
     Allows registration+login
     """
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
@@ -25,20 +27,19 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        #generate tokens
+        # generate tokens
         refresh = RefreshToken.for_user(user)
         token_data = {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-                }
-        return Response(
-                {**token_data}, status=status.HTTP_201_CREATED
-                )
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }
+        return Response({**token_data}, status=status.HTTP_201_CREATED)
+
 
 class LoginView(generics.GenericAPIView):
     """Custom login view"""
-    permission_classes = [AllowAny]
 
+    permission_classes = [AllowAny]
 
     def post(self, request):
         email = request.data.get("email")
@@ -46,20 +47,22 @@ class LoginView(generics.GenericAPIView):
 
         user = authenticate(request, email=email, password=password)
         if not user:
-            return Response({"error": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "Invalid Credentials"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
-        #generate refresh tokens
+        # generate refresh tokens
         refresh = RefreshToken.for_user(user)
         token_data = {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-                }
-        return Response(
-                {**token_data}, status=status.HTTP_201_CREATED
-                )
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }
+        return Response({**token_data}, status=status.HTTP_201_CREATED)
+
 
 class LogoutView(APIView):
     """Logout endpoint"""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -78,8 +81,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         """Custom permissions per action"""
-        if self.action == 'list':
+        if self.action == "list":
             return [IsAdminUser()]
-        elif self.action == 'create':
+        elif self.action == "create":
             return [AllowAny()]
         return [IsAuthenticated()]

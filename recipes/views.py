@@ -1,6 +1,8 @@
 from rest_framework import viewsets, status, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Recipe
+from ratings.models import Rating
+from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RecipeSerializer
@@ -20,7 +22,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Viewset to handle recipe CRUD"""
-    queryset = Recipe.objects.all().select_related("author", "nutritional_value")
+    queryset = Recipe.objects.annotate(avg_rating=Avg('ratings__rating'), total_ratings=Count('ratings')).select_related("author", "nutritional_value")
     serializer_class = RecipeSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = RecipeFilter

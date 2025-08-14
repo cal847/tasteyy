@@ -80,9 +80,9 @@ def fetch_recipes(self, offset=0, batch_size=10):
 
             # schedule after 12 minutes
             fetch_recipes.apply_async(
-                    kwargs={"offset": offset + batch_size, "batch_size": batch_size},
-                    countdown=60 * 12
-                    )
+                kwargs={"offset": offset + batch_size, "batch_size": batch_size},
+                countdown=60 * 12,
+            )
 
     except requests.RequestException as exc:
         print(f"Request failed: {exc}")

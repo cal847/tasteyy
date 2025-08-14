@@ -5,17 +5,19 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 User = get_user_model()
 
+
 class Rating(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    recipe = models.OneToOneField(Recipe, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="ratings")
     comment = models.TextField()
-    rating = models.IntegerField(validators=[MaxValueValidator(5), MinValueValidator(-5)]
-                                         )
+    rating = models.IntegerField(
+        validators=[MaxValueValidator(5), MinValueValidator(-5)]
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("user", "recipe")
 
     def __str__(self):
-        return self.rating
-    
-    def avg_rating(self):
-        #calculates the average rating of a recipe and returns as a dictionary
-        ratings = self.ratings.all()
-        return ratings.aggregate(models.Avg("value"))["value__avg"] or 0
+        return f"{self.rating}"

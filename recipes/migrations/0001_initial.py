@@ -16,38 +16,164 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Recipe',
+            name="Recipe",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('category', models.CharField(choices=[('breakfast', 'Breakfast'), ('lunch', 'Lunch'), ('dinner', 'Dinner'), ('dessert', 'Dessert'), ('snack', 'Snack')], default='none', max_length=20)),
-                ('diet', models.CharField(choices=[('vegan', 'Vegan'), ('carnivore', 'Carnivore'), ('gluten_free', 'Gluten-free'), ('none', 'None')], default='none', max_length=20)),
-                ('title', models.CharField(max_length=255)),
-                ('slug', models.SlugField(blank=True, unique=True)),
-                ('description', models.TextField()),
-                ('servings', models.CharField(max_length=255)),
-                ('ingredients', models.TextField()),
-                ('image', models.ImageField(blank=True, null=True, upload_to='recipes/')),
-                ('instructions', models.CharField(max_length=255)),
-                ('cooking_time', models.PositiveIntegerField()),
-                ('author', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='author', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[
+                            ("breakfast", "Breakfast"),
+                            ("lunch", "Lunch"),
+                            ("dinner", "Dinner"),
+                            ("dessert", "Dessert"),
+                            ("snack", "Snack"),
+                        ],
+                        default="none",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "diet",
+                    models.CharField(
+                        choices=[
+                            ("vegan", "Vegan"),
+                            ("carnivore", "Carnivore"),
+                            ("gluten_free", "Gluten-free"),
+                            ("none", "None"),
+                        ],
+                        default="none",
+                        max_length=20,
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("slug", models.SlugField(blank=True, unique=True)),
+                ("description", models.TextField()),
+                ("servings", models.CharField(max_length=255)),
+                ("ingredients", models.TextField()),
+                (
+                    "image",
+                    models.ImageField(blank=True, null=True, upload_to="recipes/"),
+                ),
+                ("instructions", models.CharField(max_length=255)),
+                ("cooking_time", models.PositiveIntegerField()),
+                (
+                    "author",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="author",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='NutritionalValue',
+            name="NutritionalValue",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('calories_kcal', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('protein', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('fat', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('carbs', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('fiber', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('sugars', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('sodium', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('cholesterol', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('calcium', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('iron', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('vitamin_c', models.FloatField(default=0.0, validators=[django.core.validators.MinValueValidator(0.0)])),
-                ('recipe', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='nutritional_value', to='recipes.recipe')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "calories_kcal",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "protein",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "fat",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "carbs",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "fiber",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "sugars",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "sodium",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "cholesterol",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "calcium",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "iron",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "vitamin_c",
+                    models.FloatField(
+                        default=0.0,
+                        validators=[django.core.validators.MinValueValidator(0.0)],
+                    ),
+                ),
+                (
+                    "recipe",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="nutritional_value",
+                        to="recipes.recipe",
+                    ),
+                ),
             ],
         ),
     ]
