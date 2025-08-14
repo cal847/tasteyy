@@ -6,6 +6,14 @@ from .models import Recipe
 class RecipeFilter(django_filters.FilterSet):
     """Filters for recipes"""
 
+    # preparation time filters
+    min_preparation_time = django_filters.NumberFilter(
+        field_name="prep_time", lookup_expr="gte"
+    )
+    max_preparation_time = django_filters.NumberFilter(
+        field_name="prep_time", lookup_expr="lte"
+    )
+
     # cooking time filters
     min_cooking_time = django_filters.NumberFilter(
         field_name="cooking_time", lookup_expr="gte"
@@ -21,6 +29,12 @@ class RecipeFilter(django_filters.FilterSet):
 
     # diet filter
     diet = django_filters.CharFilter(field_name="diet__name", lookup_expr="iexact")
+
+    # title filter
+    title = django_filters.CharFilter(field_name="title", lookup_expr="icontains")
+
+    # ingredient filter
+    ingredient = django_filters.CharFilter(field_name="ingredients", lookup_expr="icontains")
 
     # search
     search = django_filters.CharFilter(method="filter_search")
