@@ -2,7 +2,7 @@ from rest_framework import viewsets, status, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Recipe
 from ratings.models import Rating
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RecipeSerializer

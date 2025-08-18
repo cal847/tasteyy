@@ -2,14 +2,29 @@ import requests
 from celery import shared_task
 from .models import Recipe, NutritionalValue
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 API_URL = "https://api.spoonacular.com/recipes/complexSearch"
 API_KEY = settings.SPOONACULAR_API_KEY
 
+fetch_start_time = None
 
 @shared_task(bind=True, max_retries=3)
 def fetch_recipes(self, offset=0, batch_size=10):
     """Fetches recipes from api until their recipes matches our database"""
+
+    global fetch_start_time
+
+    if fetch_start_time is None:
+        fetch_start_time = timezone.now()
+
+    elapsed = timezone.now() - fetch_start_time
+
+    if elapsed > timedelta(minutes=149):
+        """Stops fetching after 149 min to prevent reaching limit"""
+        print("Reached 149 minute limit. Stopping fetch.")
+        return "Fetch completed - 149 minutes elapsed"
 
     params = {
         "apiKey": API_KEY,
@@ -81,12 +96,12 @@ def fetch_recipes(self, offset=0, batch_size=10):
             # schedule after 12 minutes
             fetch_recipes.apply_async(
                 kwargs={"offset": offset + batch_size, "batch_size": batch_size},
-                countdown=60 * 12,
+                countdown=60,
             )
 
     except requests.RequestException as exc:
         print(f"Request failed: {exc}")
-        raise self.retry(exc=exc, countdown=60 * 15)  # Retry in 15 mins
+        raise self.retry(exc=exc, countdown=60)  # Retry in 1 mins
 
 
 def create_or_update_nutrition(recipe, nutrition_data):

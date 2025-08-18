@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tasteyy</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="nav-bar">
+            <p> Tasteyy </p>
+
+            {% if request.resolver_match.url_name != "profile" %}
+            <form method="get" action="{%  %}">
+                <input type="search" name="q" placeholder="search recipe...">
+            </form>
+            {% endif %}
+
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a>My Account</a></li>
+                    <li><a>Logout</a></li>
+                {% else %}
+                    <li><a>Login</a></li>
+                    <li><a>Register</a></li>
+                {% endif %}
+            </ul>
+            
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}
+        
+        {% block content %}
+    </main>
+
+</body>
+</html>
