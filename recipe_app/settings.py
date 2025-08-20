@@ -157,7 +157,7 @@ CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
 CELERY_BEAT_SCHEDULE = {
     "fetch_recipes_every_minutes": {
         "task": "recipes.tasks.fetch_recipes",
-        "schedule": 60,
+        "schedule": 360,
         "kwargs": {'offset': 0, 'batch_size': 10}
         },
     }

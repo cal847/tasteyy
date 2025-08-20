@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background-color: hsl(60, 68%, 95%);
+    font-family: "Kalam", cursive;
+
+}
+.nav-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    box-shadow: 0 3px 6px rgb(239, 240, 222);
+}
+.nav-bar ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+    
+}
+.title {
+    color: rgb(255, 8, 0);
+    font-size: 1.6rem;
+    margin-left: 25px;
+}
+.nav-bar ul a {
+    text-decoration: none;
+    color: rgb(193, 9, 3);
+    font-size: 1.2rem;
+}
+
+.nav-bar ul li {
+    transition: all 0.3s ease;   
+}
+
+.nav-bar ul li:hover {
+    scale: 1.1;
+}
+
+.nav-bar form {
+    position: relative;
+}
+
+.nav-bar form input {
+    outline: none;
+    border: none;
+    border-radius: 24px;
+    padding: 10px;
+    height: 30px;
+    width: 300px;
+    text-align: center;
+    font-weight: bold;
+    font-family: "Kalam", cursive;
+}
+
+.nav-bar form input:focus {
+    box-shadow: 0 3px 6px rgba(127, 6, 2, 0.205);
+}
+
+input[type="search"]::placeholder, .nav-bar form i {
+    color: rgb(127, 7, 2);
+}
+
+.nav-bar form i {
+    position: absolute;
+    top: 8.5px;
+    left: 14px;
+    font-size: 0.9rem;
+}

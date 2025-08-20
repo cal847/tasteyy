@@ -7,8 +7,35 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RecipeSerializer
 from .filters import RecipeFilter
+from django.shortcuts import render
+from django.http import JsonResponse
 
 User = get_user_model()
+
+def search_recipes(request):
+    """
+    Renders search queries
+    """
+    query = request.GET.get("q", "")
+    results = []
+    if query:
+        qs = results = Recipe.objects.filter(title__icontains=query)
+        results = list(qs.values("id", "title", "description"))
+    return render(request, 'search_list.html')
+
+def recipe_list(self):
+    """
+    Renders recipes
+    """
+    queryset = Recipe.objects.all()
+
+    #4 recipes per page
+    paginator = Paginator(queryset, 4)
+
+    page_number = request.GET.get("page")
+    recipes = paginator.get_page(page_number)
+
+    return render(request, "recipes/recipe_list.html", {"recipes": recipes})
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """Determines permissions of users"""

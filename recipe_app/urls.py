@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
+from django.shortcuts import render
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 
 def home(request):
-    return JsonResponse({"message": "Welcome to recipe app APIs"})
+    return render(request, "base.html")
 
 
 urlpatterns = [
@@ -20,7 +21,7 @@ urlpatterns = [
     ),
 
     # user urls`
-    path("api/", include("users.urls")),
+    path("api/users/", include("users.urls")),
 
     # admin urls
     path("api/admin/", include("admin.urls")),

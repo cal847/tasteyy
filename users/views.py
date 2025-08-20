@@ -1,5 +1,5 @@
 from rest_framework import viewsets, generics, status
-from .serializers import UserSerializer, MyTokenObtainPairSerializer
+from .serializers import UserSerializer, MyTokenObtainPairSerializer, LoginSerializer
 from rest_framework.decorators import action
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -33,6 +33,8 @@ class RegisterView(generics.CreateAPIView):
             "refresh": str(refresh),
             "access": str(refresh.access_token),
         }
+
+        #future fix: add user data if you will need it
         return Response({**token_data}, status=status.HTTP_201_CREATED)
 
 
@@ -40,6 +42,7 @@ class LoginView(generics.GenericAPIView):
     """Custom login view"""
 
     permission_classes = [AllowAny]
+    serializer_class = LoginSerializer
 
     def post(self, request):
         email = request.data.get("email")
@@ -68,6 +71,8 @@ class LogoutView(APIView):
     def post(self, request):
         try:
             refresh_token = request.data["refresh"]
+            if not refresh_token:
+                return Response({"error": "Refresh token required"}, status=status.HTTP_400_BAD_REQUEST)
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response(status=status.HTTP_205_RESET_CONTENT)
@@ -76,9 +81,13 @@ class LogoutView(APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    def get_query_set(self):
+        user = self.request.user
+        if user.is_staff:
+            return User.objects.all()
+        return User.objects.filter(id=user.id)
     def get_permissions(self):
         """Custom permissions per action"""
         if self.action == "list":

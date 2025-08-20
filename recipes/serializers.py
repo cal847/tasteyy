@@ -48,7 +48,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             "nutritional_value",
         ]
 
-    def get_avg_rating(self, obj):
+    def get_average_rating(self, obj):
         """Returns the average rating for a recipe"""
         return round(obj.avg_rating, 1) if obj.avg_rating else None
 
