@@ -2,21 +2,35 @@ import requests
 from celery import shared_task
 from .models import Recipe, NutritionalValue
 from django.conf import settings
+from django.utils import timezone
+from datetime import date
+from django.core.cache import cache
 
 API_URL = "https://api.spoonacular.com/recipes/complexSearch"
 API_KEY = settings.SPOONACULAR_API_KEY
-
 
 @shared_task(bind=True, max_retries=3)
 def fetch_recipes(self, offset=0, batch_size=10):
     """Fetches recipes from api until their recipes matches our database"""
 
+    recipes_per_call = 100
+    daily_limit = 50
+
+    #prevent reaching api call limit
+    today = date.today()
+    cache_key = f"spoonacular_calls_{today}"
+    calls_used = cache.get(cache_key, 0)
+
+    if calls_used > daily_limit:
+        return f"Daily limit reached: {calls_used}/{daily_limit}"
+
     params = {
         "apiKey": API_KEY,
         "offset": offset,
-        "number": batch_size,
+        "number": 100,
         "addRecipeInformation": True,
         "includeNutrition": True,
+        "sort": "random",
     }
 
     try:
@@ -25,6 +39,10 @@ def fetch_recipes(self, offset=0, batch_size=10):
         total_api_recipes = response.json().get("total", 0)
 
         my_recipes = Recipe.objects.count()
+
+        #increment api count
+        cache.set(cache_key, calls_used + 1, 86400)
+        print(f"API calls used today: {calls_used + 1}/{daily_limit}")
 
         # get the data from request
         data = response.json().get("results", [])
@@ -49,7 +67,7 @@ def fetch_recipes(self, offset=0, batch_size=10):
                 [ing["original"] for ing in item.get("extendedIngredients", [])]
             )
 
-            # format instructions as plain text
+# format instructions as plain text
             instructions = []
             for instr in item.get("analyzedInstructions", []):
                 for step in instr.get("steps", []):
@@ -64,7 +82,7 @@ def fetch_recipes(self, offset=0, batch_size=10):
                     "category": category,
                     "diet": diet,
                     "cooking_time": item.get("readyInMinutes", 0),
-                    "image": item.get("image"),
+                    "image_url": item.get("image"),
                     "ingredients": ingredients,
                     "servings": item.get("servings", 0),
                     "instructions": instructions,
@@ -76,17 +94,17 @@ def fetch_recipes(self, offset=0, batch_size=10):
             if "nutrition" in item:
                 create_or_update_nutrition(recipe, item["nutrition"])
 
-            print(f"Fetched {len(data)} recipes from offset {offset}.")
+        print(f"Fetched {len(data)} recipes from offset {offset}.")
 
-            # schedule after 12 minutes
-            fetch_recipes.apply_async(
-                kwargs={"offset": offset + batch_size, "batch_size": batch_size},
-                countdown=60 * 12,
-            )
+        #check if we've reached the limit
+        updated_calls = cache.get(cache_key, 0)
+        if updated_calls > daily_limit:
+            print(f"Reached daily limit of {daily_limit} calls. Stopping for today.")
+            return f"Successfully fetched {len(data)} recipes. Daily limit reached: {updated_calls}/{daily_limit}"
 
     except requests.RequestException as exc:
         print(f"Request failed: {exc}")
-        raise self.retry(exc=exc, countdown=60 * 15)  # Retry in 15 mins
+        raise self.retry(exc=exc, countdown=60)  # Retry in 1 mins
 
 
 def create_or_update_nutrition(recipe, nutrition_data):

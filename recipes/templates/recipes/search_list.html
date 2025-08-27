@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'recipes/css/recipe_list.css' %}">
+
+<div class="container">
+    <h2>Results in "{{ query }}"</h2>
+    <div class="recipe-grid">
+        {% for result in results %}
+            <div class="recipe-card">
+
+                {% if result.image_url %}
+                    <img src="{{ result.image_url }}" alt="{{ result.title }}">
+                {% elif result.image %}
+                    <img src="{{ result.image.url }}" alt="{{ result.title }}">
+                {% else %}
+                    <img src="{% static 'recipes/images/default.jpg' %}" alt="{{ result.title }}">
+                {% endif %}
+
+                <div class="recipe-info">
+                    <h3>{{ result.title }}</h3>
+                    <p>Category: {{ result.category }}</p>
+                    <p> Cooking Time: {{ result.cooking_time }} min</p>
+                    <p> Ratings: 
+                        {% if result.avg_rating %}
+                            {{ result.avg_rating|floatformat:1 }}
+                        {% else %}
+                            No ratings yet
+                        {% endif %}                        
+                    </p>
+                </div>
+            </div>
+        {% empty %}
+            <p>No recipes yet. Check back soon!</p>
+        {% endfor %}
+    </div>
+
+    <div class="pagination">
+        {% if results.has_previous %}
+            <a href="?page=1">First</a>
+            <a href="?page={{ recipes.previous_page_number }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ results.number }} of {{ results.paginator.num_pages }}</span>
+
+        {% if results.has_next %}
+            <a href="?page={{ results.next_page_number }}">Next</a>
+            <a href="?page={{ results.paginator.num_pages }}">Last</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

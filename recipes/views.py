@@ -2,13 +2,47 @@ from rest_framework import viewsets, status, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Recipe
 from ratings.models import Rating
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RecipeSerializer
 from .filters import RecipeFilter
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.core.paginator import Paginator
 
 User = get_user_model()
+
+def home(request):
+    queryset = Recipe.objects.annotate(avg_rating=Avg("ratings__rating"))
+
+    top_recipes = Recipe.objects.annotate(avg_rating=Avg("ratings__rating")).order_by("-avg_rating")[:4]
+
+    #4 recipes per page
+    paginator = Paginator(queryset, 4)
+
+    page_number = request.GET.get("page")
+    recipes = paginator.get_page(page_number)
+
+    return render(request, "recipes/recipe_list.html", {"recipes": recipes, "top_recipes": top_recipes})
+
+def search_recipes(request):
+    """
+    Renders search queries
+    """
+    query = request.GET.get("q", "")
+    results = []
+    if query:
+        results = Recipe.objects.filter(title__icontains=query)
+    return render(request, 'recipes/search_list.html', {"results": results, "query": query})
+
+# def recipe_list(request):
+#     """
+#     Renders recipes
+#     """
+    
+
+#     return render(request, "recipes/recipe_list.html", {"recipes": recipes})
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """Determines permissions of users"""

@@ -7,11 +7,20 @@ from django.utils.text import slugify
 
 class Recipe(models.Model):
     CATEGORY_CHOICES = [
-        ("breakfast", "Breakfast"),
-        ("lunch", "Lunch"),
-        ("dinner", "Dinner"),
+        ("main course", "Main Course"),
+        ("side dish", "Side Dish"),
         ("dessert", "Dessert"),
+        ("appetizer", "Appetizer"),
+        ("salad", "Salad"),
+        ("bread", "Bread"),
+        ("breakfast", "Breakfast"),
+        ("soup", "Soup"),
+        ("beverage", "Beverage"),
+        ("sauce", "Sauce"),
+        ("marinade", "Marinade"),
+        ("fingerfood", "Fingerfood"),
         ("snack", "Snack"),
+        ("drink", "Drink"),
     ]
 
     DIET_CHOICES = [
@@ -35,14 +44,15 @@ class Recipe(models.Model):
         help_text="ID from Spoonacular", null=True, blank=True
     )
     diet = models.CharField(max_length=20, choices=DIET_CHOICES, default="none")
-    title = models.CharField(max_length=255)
+    title = models.TextField()
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
     servings = models.PositiveIntegerField()
     ingredients = models.TextField()
     image = models.ImageField(upload_to="recipes/", blank=True, null=True)
+    image_url = models.URLField(blank=True, null=True)
     instructions = models.TextField()
-    prep_time = models.PositiveIntegerField()
+    prep_time = models.PositiveIntegerField(default=0)
     cooking_time = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -58,7 +68,7 @@ class Recipe(models.Model):
     def avg_rating(self):
         """Calculates the average rating of a recipe and returns as a dictionary"""
         ratings = self.ratings.all()
-        return ratings.aggregate(avg_rating=Avg("rating"))
+        return ratings.aggregate(avg_rating=Avg("rating"))["avg_rating"] or 0
 
     def total_ratings(self):
         """Returns the total number of ratings for a recipe"""

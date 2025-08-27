@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} Tasteyy {% endblock %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <nav class="nav-bar">
+            <p class="title"> Tasteyy </p>
+
+            {% if request.resolver_match.url_name != "profile" %}
+            <form method="get" action="{% url 'recipes:search' %}">
+                <i class="fas fa-search search-icon"></i>
+                <input type="search" name="q" placeholder="search recipe...">
+            </form>
+            {% endif %}
+
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a><i class="fas fa-user"></i> My Account</a></li>
+                    <li><a href="api/users/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                {% else %}
+                    <li><a href="api/users/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <li><a href="api/users/register"><i class="fas fa-user-plus"></i> Register</a></li>
+                {% endif %}
+            </ul>
+            
+        </nav>
+    </header>
+    
+    <main>
+        {% block content %}
+        
+        {% endblock %}
+    </main>
+
+</body>
+</html>
