@@ -2,15 +2,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from django.shortcuts import render
+from recipes.views import home
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
-
-def home(request):
-    return render(request, "base.html")
-
-
 urlpatterns = [
-    path("", home),
+    path("", home, name="home"),
     path("admin/", admin.site.urls),
     # swagger urls
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

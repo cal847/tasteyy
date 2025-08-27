@@ -67,7 +67,7 @@ def fetch_recipes(self, offset=0, batch_size=10):
                 [ing["original"] for ing in item.get("extendedIngredients", [])]
             )
 
-            # format instructions as plain text
+# format instructions as plain text
             instructions = []
             for instr in item.get("analyzedInstructions", []):
                 for step in instr.get("steps", []):
@@ -82,7 +82,7 @@ def fetch_recipes(self, offset=0, batch_size=10):
                     "category": category,
                     "diet": diet,
                     "cooking_time": item.get("readyInMinutes", 0),
-                    "image": item.get("image"),
+                    "image_url": item.get("image"),
                     "ingredients": ingredients,
                     "servings": item.get("servings", 0),
                     "instructions": instructions,

@@ -9,8 +9,22 @@ from .serializers import RecipeSerializer
 from .filters import RecipeFilter
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.core.paginator import Paginator
 
 User = get_user_model()
+
+def home(request):
+    queryset = Recipe.objects.annotate(avg_rating=Avg("ratings__rating"))
+
+    top_recipes = Recipe.objects.annotate(avg_rating=Avg("ratings__rating")).order_by("-avg_rating")[:4]
+
+    #4 recipes per page
+    paginator = Paginator(queryset, 4)
+
+    page_number = request.GET.get("page")
+    recipes = paginator.get_page(page_number)
+
+    return render(request, "recipes/recipe_list.html", {"recipes": recipes, "top_recipes": top_recipes})
 
 def search_recipes(request):
     """
@@ -19,23 +33,16 @@ def search_recipes(request):
     query = request.GET.get("q", "")
     results = []
     if query:
-        qs = results = Recipe.objects.filter(title__icontains=query)
-        results = list(qs.values("id", "title", "description"))
-    return render(request, 'search_list.html')
+        results = Recipe.objects.filter(title__icontains=query)
+    return render(request, 'recipes/search_list.html', {"results": results, "query": query})
 
-def recipe_list(self):
-    """
-    Renders recipes
-    """
-    queryset = Recipe.objects.all()
+# def recipe_list(request):
+#     """
+#     Renders recipes
+#     """
+    
 
-    #4 recipes per page
-    paginator = Paginator(queryset, 4)
-
-    page_number = request.GET.get("page")
-    recipes = paginator.get_page(page_number)
-
-    return render(request, "recipes/recipe_list.html", {"recipes": recipes})
+#     return render(request, "recipes/recipe_list.html", {"recipes": recipes})
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """Determines permissions of users"""
