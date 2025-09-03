@@ -98,9 +98,15 @@ def fetch_recipes(self, offset=0, batch_size=10):
 
         #check if we've reached the limit
         updated_calls = cache.get(cache_key, 0)
+
         if updated_calls > daily_limit:
             print(f"Reached daily limit of {daily_limit} calls. Stopping for today.")
-            return f"Successfully fetched {len(data)} recipes. Daily limit reached: {updated_calls}/{daily_limit}"
+        else:
+            
+            #run the task again if calls is less than limit
+            fetch_recipes.apply_async(args=[offset + batch_size], countdown=5)
+            
+        return f"Successfully fetched {len(data)} recipes. Daily limit reached: {updated_calls}/{daily_limit}"
 
     except requests.RequestException as exc:
         print(f"Request failed: {exc}")
