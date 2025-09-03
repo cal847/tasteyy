@@ -11,8 +11,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegistrationForm
 from django.contrib import messages
-from django.contrib.auth import login
-from .forms import RegistrationForm
+from django.contrib.auth import login, logout
 
 User = get_user_model()
 
@@ -39,9 +38,9 @@ class RegisterView(generics.CreateAPIView):
             "access": str(refresh.access_token),
         }
         
-        return Response({
+        return Response(
             {**token_data},
-        }, status=status.HTTP_201_CREATED)
+            status=status.HTTP_201_CREATED)
 
 def register_form_view(request):
     """
@@ -55,10 +54,10 @@ def register_form_view(request):
             login(request, user)
             messages.success(request, "Welcome! Your account was created.")
             return redirect('home')
-        else:
-            form = RegistrationForm()
+    else:
+        form = RegistrationForm()
         
-        return render(request, 'accounts/register.html', {'form': form})
+    return render(request, 'accounts/register.html', {'form': form})
 
 class LoginView(generics.GenericAPIView):
     """Custom login view"""
@@ -89,7 +88,7 @@ def login_form_view(request):
     Handles login via HTML form for browser users
     """
     if request.method == "POST":
-        form = AuthentiationForm(request, data=request.POST)
+        form = AuthenticationForm(request, data=request.POST)
 
         if form.is_valid():
             username = form.cleaned_data.get("username")
@@ -127,11 +126,23 @@ class LogoutView(APIView):
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+def logout_form_view(request):
+    """
+    Handles logouts in template view
+    """
+    if request.user.is_authenticated:
+        username=request.user.username
+        logout(request)
+        message = f"You've been logged out successfully!"
+    else:
+        message = f"Invalid request"
+    
+    return redirect('home')
 
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
 
-    def get_query_set(self):
+    def get_queryset(self):
         user = self.request.user
         if user.IsAdmin:
             return User.objects.all()

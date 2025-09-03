@@ -45,7 +45,7 @@ class Recipe(models.Model):
     )
     diet = models.CharField(max_length=20, choices=DIET_CHOICES, default="none")
     title = models.TextField()
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=500)
     description = models.TextField(blank=True, null=True)
     servings = models.PositiveIntegerField()
     ingredients = models.TextField(blank=True, null=True)

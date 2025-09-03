@@ -23,11 +23,11 @@
 
             <ul>
                 {% if user.is_authenticated %}
-                    <li><a><i class="fas fa-user"></i> My Account</a></li>
-                    <li><a href="api/users/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    <li><a href=""><i class="fas fa-user"></i> My Account</a></li>
+                    <li><a href="accounts/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 {% else %}
-                    <li><a href="api/users/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-                    <li><a href="api/users/register"><i class="fas fa-user-plus"></i> Register</a></li>
+                    <li><a href="accounts/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <li><a href="accounts/register"><i class="fas fa-user-plus"></i> Register</a></li>
                 {% endif %}
             </ul>
             
