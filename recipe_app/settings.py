@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "users",
     "ratings",
     "favourites",
+    "accounts",
     "django_filters",
     "drf_spectacular",
 ]

@@ -66,15 +66,15 @@ def fetch_recipes(self, offset=0, batch_size=10):
             ingredients = "\n".join(
                 [ing["original"] for ing in item.get("extendedIngredients", [])]
             )
-
-# format instructions as plain text
+            
+            # format instructions as plain text
             instructions = []
             for instr in item.get("analyzedInstructions", []):
                 for step in instr.get("steps", []):
                     instructions.append(f"{step['number']}. {step['step']}")
             instructions = "\n".join(instructions)
 
-            # creat or update recipe
+            # create or update recipe
             recipe, created = Recipe.objects.update_or_create(
                 api_id=item["id"],
                 defaults={
@@ -86,7 +86,7 @@ def fetch_recipes(self, offset=0, batch_size=10):
                     "ingredients": ingredients,
                     "servings": item.get("servings", 0),
                     "instructions": instructions,
-                    "description": item.get("summary", "")[:500],
+                    "description": item.get("summary", ""),
                     "author": None,
                 },
             )

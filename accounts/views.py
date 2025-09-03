@@ -7,10 +7,14 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import RegistrationForm
+from django.contrib import messages
+from django.contrib.auth import login
+from .forms import RegistrationForm
 
 User = get_user_model()
-
 
 class RegisterView(generics.CreateAPIView):
     """
@@ -20,6 +24,7 @@ class RegisterView(generics.CreateAPIView):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    form = RegistrationForm
 
     def create(self, request, *args, **kwargs):
         """Logs in automatically after register by returning tokens"""
@@ -33,10 +38,27 @@ class RegisterView(generics.CreateAPIView):
             "refresh": str(refresh),
             "access": str(refresh.access_token),
         }
+        
+        return Response({
+            {**token_data},
+        }, status=status.HTTP_201_CREATED)
 
-        #future fix: add user data if you will need it
-        return Response({**token_data}, status=status.HTTP_201_CREATED)
+def register_form_view(request):
+    """
+    Handle HTML form submission for browser users
+    """
+    if request.method == 'POST':
+        form = RegistrationForm(request.POST)
 
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Welcome! Your account was created.")
+            return redirect('home')
+        else:
+            form = RegistrationForm()
+        
+        return render(request, 'accounts/register.html', {'form': form})
 
 class LoginView(generics.GenericAPIView):
     """Custom login view"""
@@ -62,6 +84,32 @@ class LoginView(generics.GenericAPIView):
         }
         return Response({**token_data}, status=status.HTTP_201_CREATED)
 
+def login_form_view(request):
+    """
+    Handles login via HTML form for browser users
+    """
+    if request.method == "POST":
+        form = AuthentiationForm(request, data=request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Welcome back, {username}!")
+
+                # Redirect to 'next' if exists, else home
+                return redirect(request.GET.get("next", "home"))
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid input. Please check your credentials.")
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, "accounts/login.html", {"form": form})
 
 class LogoutView(APIView):
     """Logout endpoint"""
@@ -85,7 +133,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_query_set(self):
         user = self.request.user
-        if user.is_staff:
+        if user.IsAdmin:
             return User.objects.all()
         return User.objects.filter(id=user.id)
     def get_permissions(self):
