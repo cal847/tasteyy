@@ -17,7 +17,7 @@
 		<form method="post">
 			{% csrf_token %}
 
-			<label for="{{ form.email.id_for_label }}">Email</label>{{ form.email }}
+			<label for="{{ form.username.id_for_label }}">Email</label>{{ form.username }}
 			<label for="{{ form.password1.id_for_label }}">Password</label>
 			{{ form.password }}
 

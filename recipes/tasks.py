@@ -19,7 +19,13 @@ def fetch_recipes(self, offset=0, batch_size=10):
     #prevent reaching api call limit
     today = date.today()
     cache_key = f"spoonacular_calls_{today}"
-    calls_used = cache.get(cache_key, 0)
+    
+    # atomic increment before request
+    try:
+        calls_used = cache.incr(cache_key, ignore_key_check=True)
+    except ValueError:
+        cache.set(cache_key, 1, 86400)
+        calls_used = 1
 
     if calls_used > daily_limit:
         return f"Daily limit reached: {calls_used}/{daily_limit}"
@@ -36,82 +42,80 @@ def fetch_recipes(self, offset=0, batch_size=10):
     try:
         response = requests.get(API_URL, params=params, timeout=10)
         response.raise_for_status()
-        total_api_recipes = response.json().get("total", 0)
+    except requests.HTTPError as exc:
 
-        my_recipes = Recipe.objects.count()
-
-        #increment api count
-        cache.set(cache_key, calls_used + 1, 86400)
-        print(f"API calls used today: {calls_used + 1}/{daily_limit}")
-
-        # get the data from request
-        data = response.json().get("results", [])
-
-        for item in data:
-            # extract categories
-            category = "none"
-            for dt in item.get("dishTypes", []):
-                if dt.lower() in dict(Recipe.CATEGORY_CHOICES):
-                    category = dt.lower()
-                    break
-
-            # extract diet
-            diet = "none"
-            for d in item.get("diets", []):
-                if d.lower().replace("-", "_") in dict(Recipe.DIET_CHOICES):
-                    diet = d.lower().replace("-", "_")
-                    break
-
-            # format ingredients as plain text
-            ingredients = "\n".join(
-                [ing["original"] for ing in item.get("extendedIngredients", [])]
-            )
-            
-            # format instructions as plain text
-            instructions = []
-            for instr in item.get("analyzedInstructions", []):
-                for step in instr.get("steps", []):
-                    instructions.append(f"{step['number']}. {step['step']}")
-            instructions = "\n".join(instructions)
-
-            # create or update recipe
-            recipe, created = Recipe.objects.update_or_create(
-                api_id=item["id"],
-                defaults={
-                    "title": item.get("title"),
-                    "category": category,
-                    "diet": diet,
-                    "cooking_time": item.get("readyInMinutes", 0),
-                    "image_url": item.get("image"),
-                    "ingredients": ingredients,
-                    "servings": item.get("servings", 0),
-                    "instructions": instructions,
-                    "description": item.get("summary", ""),
-                    "author": None,
-                },
-            )
-
-            if "nutrition" in item:
-                create_or_update_nutrition(recipe, item["nutrition"])
-
-        print(f"Fetched {len(data)} recipes from offset {offset}.")
-
-        #check if we've reached the limit
-        updated_calls = cache.get(cache_key, 0)
-
-        if updated_calls > daily_limit:
-            print(f"Reached daily limit of {daily_limit} calls. Stopping for today.")
-        else:
-            
-            #run the task again if calls is less than limit
-            fetch_recipes.apply_async(args=[offset + batch_size], countdown=5)
-            
-        return f"Successfully fetched {len(data)} recipes. Daily limit reached: {updated_calls}/{daily_limit}"
-
+        # Retry only ofr network errors
+        if response.status_code == 402:
+            return f"Used maxed quotas at {calls_used}/{daily_limit}"
+        
+        raise self.retry(exc=exc, countdown=30)  # Retry in 30 seconds
+    
     except requests.RequestException as exc:
-        print(f"Request failed: {exc}")
-        raise self.retry(exc=exc, countdown=60)  # Retry in 1 mins
+        raise self.retry(exc=exc, countdown=20)
 
+    # get the data from request
+    data = response.json().get("results", [])
+
+    for item in data:
+        # extract categories
+        category = "none"
+        for dt in item.get("dishTypes", []):
+            if dt.lower() in dict(Recipe.CATEGORY_CHOICES):
+                category = dt.lower()
+                break
+
+        # extract diet
+        diet = "none"
+        for d in item.get("diets", []):
+            if d.lower().replace("-", "_") in dict(Recipe.DIET_CHOICES):
+                diet = d.lower().replace("-", "_")
+                break
+
+        # format ingredients as plain text
+        ingredients = "\n".join(
+            [ing["original"] for ing in item.get("extendedIngredients", [])]
+        )
+        
+        # format instructions as plain text
+        instructions = []
+        for instr in item.get("analyzedInstructions", []):
+            for step in instr.get("steps", []):
+                instructions.append(f"{step['number']}. {step['step']}")
+        instructions = "\n".join(instructions)
+
+        # create or update recipe
+        recipe, created = Recipe.objects.update_or_create(
+            api_id=item["id"],
+            defaults={
+                "title": item.get("title"),
+                "category": category,
+                "diet": diet,
+                "cooking_time": item.get("readyInMinutes", 0),
+                "image_url": item.get("image"),
+                "ingredients": ingredients,
+                "servings": item.get("servings", 0),
+                "instructions": instructions,
+                "description": item.get("summary", ""),
+                "author": None,
+            },
+        )
+
+        if "nutrition" in item:
+            create_or_update_nutrition(recipe, item["nutrition"])
+
+    print(f"Fetched {len(data)} recipes from offset {offset}.")
+
+    #check if we've reached the limit
+    updated_calls = cache.get(cache_key, 0)
+
+    if updated_calls > daily_limit:
+        print(f"Reached daily limit of {daily_limit} calls. Stopping for today.")
+    else:
+        
+        #run the task again if calls is less than limit
+        fetch_recipes.apply_async(args=[offset + batch_size], countdown=5)
+        
+    return f"Successfully fetched {len(data)} recipes. Daily limit reached: {updated_calls}/{daily_limit}"
 
 def create_or_update_nutrition(recipe, nutrition_data):
     """Function to create or update nutritional data in my database"""
