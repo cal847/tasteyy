@@ -1,31 +1,71 @@
 {% extends 'accounts/base.html' %}
-
-{% block title %}Sign up {% endblock %}
+{% block title %}Sign up{% endblock %}
 
 {% block content %}
 <div class="container">
-	<h3> Register </h3>
-	<div class="body">
-		{% if messages %}
-			<div class="messages">
-				{% for message in messages%}
-					{{ message }}
-				{% endfor %}
-			</div>
-		{% endif %}
-	
-		<form method="post" action="{% url 'accounts:register' %}">
-			{% csrf_token %}
-
-			<label for="{{ form.username.id_for_label }}">Username</label> {{ form.username }}
-			<label for="{{ form.email.id_for_label }}">Email</label> {{ form.email }}
-			<label for="{{ form.password1.id_for_label }}">Password</label> {{ form.password1 }}
-			<label for="{{ form.password2.id_for_label }}">Confirm Password</label> {{ form.password2 }}
-			<button type="submit" class="btn"> Sign Up </button>
-		</form>
-
-		<p> Already have an account? <a href="{% url 'accounts:login' %}">Log in</a>
-	</div>
+    <h3>Register</h3>
+    
+    <!-- Success Messages ONLY (Floating at top) -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div class="messages success-message">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    
+    <div class="body">
+        <!-- Form -->
+        <form method="post" action="{% url 'accounts:register' %}">
+            {% csrf_token %}
+            
+            <!-- Form Fields Container (Scrollable) -->
+            <div class="form-fields">
+                <!-- Username Field -->
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="field-error">{{ form.username.errors.0 }}</div>
+                {% endif %}
+                
+                <!-- Email Field -->
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="field-error">{{ form.email.errors.0 }}</div>
+                {% endif %}
+                
+                <!-- Password Field -->
+                <label for="{{ form.password1.id_for_label }}">Password</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <div class="field-error">{{ form.password1.errors.0 }}</div>
+                {% endif %}
+                
+                <!-- Confirm Password Field -->
+                <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <div class="field-error">{{ form.password2.errors.0 }}</div>
+                {% endif %}
+                
+                <!-- Non-field errors (like password mismatch) -->
+                {% if form.non_field_errors %}
+                    <div class="field-error">{{ form.non_field_errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <!-- Button and Link (Always Visible) -->
+            <div class="form-footer">
+                <button type="submit" class="btn">Sign Up</button>
+            </div>
+        </form>
+        
+        <div class="form-footer">
+            <p>Already have an account? <a href="{% url 'accounts:login' %}">Log in</a></p>
+        </div>
+    </div>
 </div>
 {% endblock %}
-	

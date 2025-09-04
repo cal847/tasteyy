@@ -54,6 +54,9 @@ def register_form_view(request):
             login(request, user)
             messages.success(request, "Welcome! Your account was created.")
             return redirect('home')
+        else:
+            print(form.errors)
+            messages.error(request, form.errors)
     else:
         form = RegistrationForm()
         
