@@ -8,8 +8,8 @@
     <h2>Latest Recipes</h2>
     <div class="recipe-grid">
         {% for recipe in recipes %}
-            <div class="recipe-card">
-                {% if recipe.image %}
+            <div class="recipe-card"  onclick="window.location='{% url 'recipes:recipe_detail' recipe.slug %}'">
+                {% if recipe.image %}S
                     <img src="{{ recipe.image.url }}" alt="{{recipe.title}}">
                 {% elif recipe.image_url%}
                     <img src="{{ recipe.image_url }}" alt="{{recipe.title}}">

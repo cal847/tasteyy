@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RecipeSerializer
 from .filters import RecipeFilter
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 
@@ -35,6 +35,14 @@ def search_recipes(request):
     if query:
         results = Recipe.objects.filter(title__icontains=query)
     return render(request, 'recipes/search_list.html', {"results": results, "query": query})
+
+def recipe_detail(request, slug):
+    """
+    Renders the details for each recipe
+    """
+    recipe = get_object_or_404(Recipe, slug=slug)
+
+    return render(request, "recipes/recipe_detail.html", {"recipe": recipe})
 
 # def recipe_list(request):
 #     """
