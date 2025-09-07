@@ -8,7 +8,7 @@
     <h2>Results in "{{ query }}"</h2>
     <div class="recipe-grid">
         {% for result in results %}
-            <div class="recipe-card">
+            <a href="{% url 'recipes:recipe_detail' result.slug %}" class="recipe-card">
 
                 {% if result.image_url %}
                     <img src="{{ result.image_url }}" alt="{{ result.title }}">
@@ -22,15 +22,98 @@
                     <h3>{{ result.title }}</h3>
                     <p>Category: {{ result.category }}</p>
                     <p> Cooking Time: {{ result.cooking_time }} min</p>
-                    <p> Ratings: 
-                        {% if result.avg_rating %}
-                            {{ result.avg_rating|floatformat:1 }}
+                    <div class="rating-container">
+                        {% if recipe.avg_rating %}
+                            <div class="star-rating" data-rating="{{ recipe.avg_rating }}">
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <span class="rating-text">({{ recipe.avg_rating|floatformat:1 }})</span>
                         {% else %}
-                            No ratings yet
-                        {% endif %}                        
-                    </p>
+                            <div class="star-rating" data-rating="0">
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="star">
+                                    <svg class="star-outline" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                    <svg class="star-fill" viewBox="0 0 24 24">
+                                        <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+            </a>
         {% empty %}
             <p>No recipes yet. Check back soon!</p>
         {% endfor %}
@@ -50,4 +133,34 @@
         {% endif %}
     </div>
 </div>
+
+
+<script>
+    // Initialize star ratings when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const starRatings = document.querySelectorAll('.star-rating');
+        
+        starRatings.forEach(container => {
+            const rating = parseFloat(container.getAttribute('data-rating')) || 0;
+            const stars = container.querySelectorAll('.star');
+            
+            stars.forEach((star, index) => {
+                const starNumber = index + 1;
+                const fillElement = star.querySelector('.star-fill');
+                
+                if (rating >= starNumber) {
+                    // Full star
+                    fillElement.style.clipPath = 'inset(0 0% 0 0)';
+                } else if (rating > starNumber - 1) {
+                    // Partial star
+                    const fillPercentage = (rating - (starNumber - 1)) * 100;
+                    fillElement.style.clipPath = `inset(0 ${100 - fillPercentage}% 0 0)`;
+                } else {
+                    // Empty star
+                    fillElement.style.clipPath = 'inset(0 100% 0 0)';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

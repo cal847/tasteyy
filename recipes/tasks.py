@@ -57,49 +57,9 @@ def fetch_recipes(self, offset=0, batch_size=10):
     data = response.json().get("results", [])
 
     for item in data:
-        # extract categories
-        category = "none"
-        for dt in item.get("dishTypes", []):
-            if dt.lower() in dict(Recipe.CATEGORY_CHOICES):
-                category = dt.lower()
-                break
-
-        # extract diet
-        diet = "none"
-        for d in item.get("diets", []):
-            if d.lower().replace("-", "_") in dict(Recipe.DIET_CHOICES):
-                diet = d.lower().replace("-", "_")
-                break
-
-        # format ingredients as plain text
-        ingredients = "\n".join(
-            [ing["original"] for ing in item.get("extendedIngredients", [])]
-        )
+        #save the recipe
+        recipe = save_or_update_recipe(item)
         
-        # format instructions as plain text
-        instructions = []
-        for instr in item.get("analyzedInstructions", []):
-            for step in instr.get("steps", []):
-                instructions.append(f"{step['number']}. {step['step']}")
-        instructions = "\n".join(instructions)
-
-        # create or update recipe
-        recipe, created = Recipe.objects.update_or_create(
-            api_id=item["id"],
-            defaults={
-                "title": item.get("title"),
-                "category": category,
-                "diet": diet,
-                "cooking_time": item.get("readyInMinutes", 0),
-                "image_url": item.get("image"),
-                "ingredients": ingredients,
-                "servings": item.get("servings", 0),
-                "instructions": instructions,
-                "description": item.get("summary", ""),
-                "author": None,
-            },
-        )
-
         if "nutrition" in item:
             create_or_update_nutrition(recipe, item["nutrition"])
 
@@ -116,6 +76,81 @@ def fetch_recipes(self, offset=0, batch_size=10):
         fetch_recipes.apply_async(args=[offset + batch_size], countdown=5)
         
     return f"Successfully fetched {len(data)} recipes. Daily limit reached: {updated_calls}/{daily_limit}"
+
+def save_or_update_recipe(item):
+    """
+    Extracts the recipe details and updates or creates in DB
+    """
+    # extract categories
+    category = "none"
+    for dt in item.get("dishTypes", []):
+        if dt.lower() in dict(Recipe.CATEGORY_CHOICES):
+            category = dt.lower()
+            break
+
+    # extract diet
+    diet = "none"
+    for d in item.get("diets", []):
+        if d.lower().replace("-", "_") in dict(Recipe.DIET_CHOICES):
+            diet = d.lower().replace("-", "_")
+            break
+
+    # Ingredients
+    raw_ingredients = item.get("extendedIngredients", [])
+    ingredient_texts = []
+
+    if not raw_ingredients:
+        # Fallback: used/missed from search result
+        used = item.get("usedIngredients", [])
+        missed = item.get("missedIngredients", [])
+        raw_ingredients = used + missed
+
+    for ing in raw_ingredients:
+        text = ing.get("original") or ing.get("name") or ing.get("originalString")
+        if text:
+            ingredient_texts.append(text.strip())
+
+    ingredients = "\n".join(ingredient_texts) if ingredient_texts else "Ingredients not available."
+
+    # Instructions
+    instructions = []
+
+    analyzed = item.get("analyzedInstructions", [])
+    if analyzed and isinstance(analyzed, list):
+        for step_group in analyzed:
+            for step in step_group.get("steps", []):
+                instructions.append(f"{step['number']}. {step['step']}")
+
+    elif item.get("instructions"):
+        import re
+        raw = item["instructions"]
+        clean = re.sub(r'<[^>]+>', '', raw)  # Strip HTML
+        lines = [line.strip() for line in clean.split("\n") if line.strip()]
+        instructions = [f"{i+1}. {line}" for i, line in enumerate(lines)]
+    else:
+        instructions = ["No instructions available."]
+
+    instructions = "\n".join(instructions)
+
+    # create or update recipe
+    recipe, created = Recipe.objects.update_or_create(
+        api_id=item["id"],
+        defaults={
+            "title": item.get("title"),
+            "category": category,
+            "diet": diet,
+            "cooking_time": item.get("readyInMinutes", 0),
+            "image_url": item.get("image"),
+            "ingredients": ingredients,
+            "servings": item.get("servings", 0),
+            "instructions": instructions,
+            "description": item.get("summary", ""),
+            "author": None,
+        },
+    )
+
+    return recipe
+
 
 def create_or_update_nutrition(recipe, nutrition_data):
     """Function to create or update nutritional data in my database"""
