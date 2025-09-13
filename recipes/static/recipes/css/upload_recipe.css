@@ -1,0 +1,122 @@
+.container {
+    max-width: 700px;
+    margin: 30px auto;
+    background: #f9f1e6;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.15);
+    border: 2px solid #d4a574;
+}
+.form-title {
+    text-align: center;
+    color: #140901;
+    font-size: 24px;
+    margin-bottom: 25px;
+    text-decoration: underline;
+    text-decoration-color: #68310a;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #8b4513;
+    font-size: 16px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #d4a574;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    color: #8b4513;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #d2691e;
+    box-shadow: 0 0 5px rgba(210, 105, 30, 0.3);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #b8860b;
+    font-style: italic;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-col {
+    flex: 1;
+}
+
+.form-col label {
+    color: #8b4513;
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
+    font-weight: bold;
+}
+
+.form-col input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #d4a574;
+    border-radius: 8px;
+    background: #ffffff;
+    font-size: 14px;
+    color: #8b4513;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #5a2a08 0%, #612c08 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(210, 105, 30, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* Django form errors styling */
+.errorlist {
+    list-style: none;
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.errorlist li {
+    margin-bottom: 3px;
+}

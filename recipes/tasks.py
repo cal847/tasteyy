@@ -1,30 +1,29 @@
+import re
 import requests
 from celery import shared_task
 from .models import Recipe, NutritionalValue
 from django.conf import settings
-from django.utils import timezone
 from datetime import date
 from django.core.cache import cache
 
 API_URL = "https://api.spoonacular.com/recipes/complexSearch"
 API_KEY = settings.SPOONACULAR_API_KEY
 
+
 @shared_task(bind=True, max_retries=3)
 def fetch_recipes(self, offset=0, batch_size=10):
-    """Fetches recipes from api until their recipes matches our database"""
+    """Fetches recipes from Spoonacular and saves them into DB"""
 
-    recipes_per_call = 100
     daily_limit = 50
 
-    #prevent reaching api call limit
+    # Prevent exceeding API call limit
     today = date.today()
     cache_key = f"spoonacular_calls_{today}"
-    
-    # atomic increment before request
+
     try:
-        calls_used = cache.incr(cache_key, ignore_key_check=True)
+        calls_used = cache.incr(cache_key)
     except ValueError:
-        cache.set(cache_key, 1, 86400)
+        cache.set(cache_key, 86400)
         calls_used = 1
 
     if calls_used > daily_limit:
@@ -34,8 +33,8 @@ def fetch_recipes(self, offset=0, batch_size=10):
         "apiKey": API_KEY,
         "offset": offset,
         "number": 100,
+        "addRecipeNutrition": True,
         "addRecipeInformation": True,
-        "includeNutrition": True,
         "sort": "random",
     }
 
@@ -43,76 +42,83 @@ def fetch_recipes(self, offset=0, batch_size=10):
         response = requests.get(API_URL, params=params, timeout=10)
         response.raise_for_status()
     except requests.HTTPError as exc:
-
-        # Retry only ofr network errors
         if response.status_code == 402:
-            return f"Used maxed quotas at {calls_used}/{daily_limit}"
-        
-        raise self.retry(exc=exc, countdown=30)  # Retry in 30 seconds
-    
+            return f"You have depleted your free API calls. Please upgrade to premium"
+        raise self.retry(exc=exc, countdown=30)
+
     except requests.RequestException as exc:
         raise self.retry(exc=exc, countdown=20)
 
-    # get the data from request
     data = response.json().get("results", [])
 
     for item in data:
-        #save the recipe
-        recipe = save_or_update_recipe(item)
-        
-        if "nutrition" in item:
-            create_or_update_nutrition(recipe, item["nutrition"])
+        save_or_update_recipe(item)
 
     print(f"Fetched {len(data)} recipes from offset {offset}.")
 
-    #check if we've reached the limit
     updated_calls = cache.get(cache_key, 0)
 
-    if updated_calls > daily_limit:
-        print(f"Reached daily limit of {daily_limit} calls. Stopping for today.")
-    else:
-        
-        #run the task again if calls is less than limit
+    if updated_calls < daily_limit:
         fetch_recipes.apply_async(args=[offset + batch_size], countdown=5)
-        
+
     return f"Successfully fetched {len(data)} recipes. Daily limit reached: {updated_calls}/{daily_limit}"
 
+def clean_text(text):
+    """
+    Cleans HTML tags and whitespaces for text formatting
+    """
+    if not text:
+        return ""
+    
+    # Remove HTML tags
+    clean = re.sub(r'<[^>]+>', '', text)
+
+    # Replace multiple whitespaces with single space
+    clean = re.sub(r'\s+', ' ', clean)
+
+    # Remove extra periods and clean up punctuation
+    clean = re.sub(r'\.{2,}', '.', clean)
+
+    return clean.strip()
+
 def save_or_update_recipe(item):
-    """
-    Extracts the recipe details and updates or creates in DB
-    """
-    # extract categories
+    """Extract recipe details and save to DB"""
+
+    # Skip recipe if ingredient is missing
+    missing_ingredients = not item.get("extendedIngredients")
+    missing_instructions = not item.get("analyzedInstructions") and not item.get("instructions")
+    missing_nutrition = "nutrition" not in item
+
+    if missing_ingredients or missing_instructions or missing_nutrition:
+        print(f"Skipping recipe {item['id']}: Incomplete information")
+        return false
+
+    # --- Category ---
     category = "none"
     for dt in item.get("dishTypes", []):
         if dt.lower() in dict(Recipe.CATEGORY_CHOICES):
             category = dt.lower()
             break
 
-    # extract diet
+    # --- Diet ---
     diet = "none"
     for d in item.get("diets", []):
         if d.lower().replace("-", "_") in dict(Recipe.DIET_CHOICES):
             diet = d.lower().replace("-", "_")
             break
 
-    # Ingredients
+    # --- Ingredients ---
     raw_ingredients = item.get("extendedIngredients", [])
-    ingredient_texts = []
-
     if not raw_ingredients:
-        # Fallback: used/missed from search result
-        used = item.get("usedIngredients", [])
-        missed = item.get("missedIngredients", [])
-        raw_ingredients = used + missed
+        raw_ingredients = item.get("usedIngredients", []) + item.get("missedIngredients", [])
 
-    for ing in raw_ingredients:
-        text = ing.get("original") or ing.get("name") or ing.get("originalString")
-        if text:
-            ingredient_texts.append(text.strip())
-
+    ingredient_texts = [
+        (ing.get("original") or ing.get("name") or ing.get("originalString", "")).strip()
+        for ing in raw_ingredients if ing
+    ]
     ingredients = "\n".join(ingredient_texts) if ingredient_texts else "Ingredients not available."
 
-    # Instructions
+    # --- Instructions ---
     instructions = []
 
     analyzed = item.get("analyzedInstructions", [])
@@ -122,18 +128,28 @@ def save_or_update_recipe(item):
                 instructions.append(f"{step['number']}. {step['step']}")
 
     elif item.get("instructions"):
-        import re
         raw = item["instructions"]
-        clean = re.sub(r'<[^>]+>', '', raw)  # Strip HTML
-        lines = [line.strip() for line in clean.split("\n") if line.strip()]
-        instructions = [f"{i+1}. {line}" for i, line in enumerate(lines)]
+        clean = clean_html_text(raw)
+
+        # Split by numbered steps if they exist
+        if re.search(r'\d+\.', clean):
+            steps = re.split(r'(?=\d+\.)', clean)
+            instructions = [step.strip() for step in steps if step.strip()]
+        else:
+            # Split by sentences as fallback
+            sentences = re.split(r'(?<=[.!?])\s+', clean)
+
+        instructions = [re.sub(r'^\d+\.\s*', '', inst.strip()) for inst in instructions if inst.strip()]
     else:
         instructions = ["No instructions available."]
 
     instructions = "\n".join(instructions)
 
-    # create or update recipe
-    recipe, created = Recipe.objects.update_or_create(
+    # --- Clean description ---
+    description = clean_html_text(item.get("summary", ""))
+
+    # --- Save Recipe ---
+    recipe, _ = Recipe.objects.update_or_create(
         api_id=item["id"],
         defaults={
             "title": item.get("title"),
@@ -149,17 +165,19 @@ def save_or_update_recipe(item):
         },
     )
 
+    # --- Save Nutrition ---
+    if "nutrition" in item:
+        create_or_update_nutrition(recipe, item["nutrition"])
+
     return recipe
 
-
 def create_or_update_nutrition(recipe, nutrition_data):
-    """Function to create or update nutritional data in my database"""
+    """Create or update nutritional data in DB"""
     nutrient_map = {
         item["name"].lower(): item["amount"]
         for item in nutrition_data.get("nutrients", [])
     }
 
-    # map to my model fields
     defaults = {
         "calories_kcal": nutrient_map.get("calories", 0.0),
         "protein": nutrient_map.get("protein", 0.0),
@@ -174,8 +192,8 @@ def create_or_update_nutrition(recipe, nutrition_data):
         "vitamin_c": nutrient_map.get("vitamin c", 0.0),
     }
 
-    nutritional_value, created = NutritionalValue.objects.update_or_create(
+    nutritional_value, _ = NutritionalValue.objects.update_or_create(
         recipe=recipe, defaults=defaults
     )
 
-    return nutritional_value, created
+    return nutritional_value

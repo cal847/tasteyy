@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
+from recipes.models import Recipe
 
 User = get_user_model()
 
@@ -23,3 +24,11 @@ class RegistrationForm(UserCreationForm):
         self.fields['username'].help_text = None
         self.fields['password1'].help_text = None
         self.fields['password2'].help_text = None
+
+class AddRecipeForm(forms.ModelForm):
+    """
+    Form to handle adding new recipes.
+    """
+    class Meta:
+        model = Recipe
+        fields = ['title', 'image', 'description', 'ingredients', 'instructions', 'servings', 'cooking_time']

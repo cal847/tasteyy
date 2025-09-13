@@ -5,32 +5,43 @@
     box-sizing: border-box;
 }
 body {
-    background-color: hsl(60, 68%, 95%);
-    font-family: "Kalam", cursive;
+    background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 100px;
 }
 .nav-bar {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    background: linear-gradient(135deg, hsl(34, 46%, 27%), #613d1b);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     max-width: 100%;
+    margin: 0 auto;
     padding: 20px 25px;
-    box-shadow: 0 3px 6px rgb(239, 240, 222);
+    box-shadow: 0 5px 6px grey;
+    border-radius: 0 0 80px 80px;
+    position: fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index: 10000;
 }
 .nav-bar ul {
     display: flex;
     list-style: none;
     gap: 30px;
-    
+    justify-self: end;
 }
 .title {
-    color: rgb(255, 8, 0);
+    color: #fff;
+    justify-self: start;
     font-size: 1.6rem;
     margin-left: 25px;
+    font-weight: bold;
+    text-decoration: none;
 }
 .nav-bar ul a {
     text-decoration: none;
-    color: rgb(193, 9, 3);
+    color: #fff;
     font-size: 1.2rem;
 }
 
@@ -43,22 +54,27 @@ body {
 }
 
 .nav-bar form {
+    justify-self: center;
     position: relative;
 }
 
-.nav-bar form input {
+.nav-bar form input, .form-input {
     outline: none;
     border: none;
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 10px;
-    height: 30px;
-    width: 300px;
+    height: 40px;
+    width: 350px;
     text-align: center;
     font-weight: bold;
+    font-size: 1rem;
+    /* background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); */
     font-family: "Kalam", cursive;
 }
 
-.nav-bar form input:focus {
+.nav-bar form input:focus, .form-input:focus{
     box-shadow: 0 3px 6px rgba(127, 6, 2, 0.205);
 }
 
@@ -68,7 +84,7 @@ input[type="search"]::placeholder, .nav-bar form i {
 
 .nav-bar form i {
     position: absolute;
-    top: 8.5px;
-    left: 14px;
-    font-size: 0.9rem;
+    top: 11px;
+    left: 20px;
+    font-size: 1rem;
 }

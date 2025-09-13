@@ -42,7 +42,17 @@ def recipe_detail(request, slug):
     """
     recipe = get_object_or_404(Recipe, slug=slug)
 
-    return render(request, "recipes/recipe_detail.html", {"recipe": recipe})
+    nut_v = getattr(recipe, "nutritional_value", None)
+
+    # Split by new lines
+    ingredients = recipe.ingredients.split("\n") if recipe.ingredients else []
+    instructions = recipe.instructions.split("\n") if recipe.instructions else []
+
+    # Clean up empty strings and whitespace
+    ingredients = [ing.strip() for ing in ingredients if ing.strip()]
+    instructions = [inst.strip() for inst in instructions if inst.strip()]
+
+    return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "nut_v": nut_v, "ingredients": ingredients, "instructions": instructions},)
 
 # def recipe_list(request):
 #     """

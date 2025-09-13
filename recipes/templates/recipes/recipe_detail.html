@@ -8,15 +8,17 @@
 
 {% block content %}
 <div class="details-container">
-    {% if recipe.image %}
-        <img src="{{recipe.image.url}}" alt="{{ recipe.title }}">
-    {% elif recipe.image_url %}
-        <img src="{{recipe.image_url}}" alt="{{ recipe.title }}">
-    {% else %}
-        <img src="{% static 'recipes/images/default.jpg' %}" alt="{{ recipe.title }}">
-    {% endif %}
+    <div class="details-header">
+        {% if recipe.image %}
+            <img src="{{recipe.image.url}}" alt="{{ recipe.title }}">
+        {% elif recipe.image_url %}
+            <img src="{{recipe.image_url}}" alt="{{ recipe.title }}">
+        {% else %}
+            <img src="{% static 'recipes/images/default.jpg' %}" alt="{{ recipe.title }}">
+        {% endif %}
 
-    <h1> {{ recipe.title }}</h1>
+        <h1> {{ recipe.title }}</h1>
+    </div>
 
     <div class="details-wrapper">
         <div class="rating-container">
@@ -108,29 +110,68 @@
                     </div>
                 </div>
             {% endif %}
-            <span>({{ recipe.total_ratings }})</span>
+            <p>({{ recipe.total_ratings }})</p>
         </div>
-        <span> {{ recipe.category }}</span>
-        <span> {{ recipe.cooking_time }} min</span>
+        <p> {{ recipe.category }}</p>
+        <p> {{ recipe.cooking_time }} min</p>
+        <p> {{ recipe.servings }} servings</p>
+    </div>
+
+    <div class="nutritional-value">
+        <h1> Nutritional Values </h1>
+        {% if nut_v %}
+            <ol>
+                <li>Calories: {{ nut_v.calories_kcal }} kcal</li>
+                <li>Protein: {{ nut_v.protein }} g</li>
+                <li>Fat: {{ nut_v.fat }} g</li>
+                <li>Carbs: {{ nut_v.carbs }} g</li>
+                <li>Fiber: {{ nut_v.fiber }} g</li>
+                <li>Sugars: {{ nut_v.sugars }} g</li>
+                <li>Sodium: {{ nut_v.sodium }} mg</li>
+                <li>Cholesterol: {{ nut_v.cholesterol }} mg</li>
+                <li>Calcium: {{ nut_v.calcium }} mg</li>
+                <li>Iron: {{ nut_v.iron }} mg</li>
+                <li>Vitamin C: {{ nut_v.vitamin_c }} mg</li>
+            </ol>
+        {% else %}
+            <p>No nutritional value available</p>
+        {% endif %}
     </div>
     
-    <h1> Ingredients </h1>
-    <span class="ingredients">
-        {% if recipe.ingredients %}
-            {{recipe.ingredients}}
-        {% else %}
-            <p>Ingredients Unavailable</p>
+    <div class="recipe-grid">
+        {% if recipe.description %}
+        <div class="summary">
+            <p> {{ recipe.description }}</p>            
+        </div>
         {% endif %}
-    </span>
 
-    <h1> Instructions </h1>
-    <span class="ingredients">
-        {% if recipe.instructions %}
-            {{recipe.instructions}}
-        {% else %}
-            <p>Instructions Unavailable</p>
-        {% endif %}
-    </span>
+        <div class="ingredients">
+            <h1> Ingredients </h1>
+            {% if ingredients %}
+                <ol>
+                    {% for ingredient in ingredients%}
+                        <p>{{ ingredient }}</p>
+                    {% endfor %}
+                </ol>
+            {% else %}
+                <p>Ingredients unavailable</p>
+            {% endif %}
+        </div>
+        
+        <div class="instructions">
+            <h1> Instructions </h1>
+            {% if instructions %}
+                <ol >
+                    {% for instruction in instructions%}
+                        <p>{{ instruction }}</p>
+                    {% endfor %}
+                </ol>
+            {% else %}
+                <p>Instructions unavailable</p>
+            {% endif %}
+        </div>
+    </div>
+    
 </div>
 <script>
     // Initialize star ratings when page loads

@@ -8,7 +8,7 @@
     <h2>Results in "{{ query }}"</h2>
     <div class="recipe-grid">
         {% for result in results %}
-            <a href="{% url 'recipes:recipe_detail' result.slug %}" class="recipe-card">
+            <a href="{% url 'recipes:recipe_detail' result.slug %}" class="recipe-card" onclick="showRecipeLoading(this)">
 
                 {% if result.image_url %}
                     <img src="{{ result.image_url }}" alt="{{ result.title }}">
@@ -23,8 +23,8 @@
                     <p>Category: {{ result.category }}</p>
                     <p> Cooking Time: {{ result.cooking_time }} min</p>
                     <div class="rating-container">
-                        {% if recipe.avg_rating %}
-                            <div class="star-rating" data-rating="{{ recipe.avg_rating }}">
+                        {% if result.avg_rating %}
+                            <div class="star-rating" data-rating="{{ result.avg_rating }}">
                                 <div class="star">
                                     <svg class="star-outline" viewBox="0 0 24 24">
                                         <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
@@ -66,7 +66,7 @@
                                     </svg>
                                 </div>
                             </div>
-                            <span class="rating-text">({{ recipe.avg_rating|floatformat:1 }})</span>
+                            <span class="rating-text">({{ result.avg_rating|floatformat:1 }})</span>
                         {% else %}
                             <div class="star-rating" data-rating="0">
                                 <div class="star">
@@ -115,27 +115,33 @@
                 </div>
             </a>
         {% empty %}
-            <p>No recipes yet. Check back soon!</p>
+            <p>No recipes found for "{{ query }}". Try a different search term!</p>
         {% endfor %}
     </div>
 
-    <div class="pagination">
-        {% if results.has_previous %}
-            <a href="?page=1">First</a>
-            <a href="?page={{ recipes.previous_page_number }}">Previous</a>
-        {% endif %}
+    {% if results.paginator.num_pages > 1 %}
+        <div class="pagination">
+            {% if results.has_previous %}
+                <a href="?page=1&q={{ query }}">First</a>
+                <a href="?page={{ results.previous_page_number }}&q={{ query }}">Previous</a>
+            {% endif %}
 
-        <span>Page {{ results.number }} of {{ results.paginator.num_pages }}</span>
+            <span>Page {{ results.number }} of {{ results.paginator.num_pages }}</span>
 
-        {% if results.has_next %}
-            <a href="?page={{ results.next_page_number }}">Next</a>
-            <a href="?page={{ results.paginator.num_pages }}">Last</a>
-        {% endif %}
-    </div>
+            {% if results.has_next %}
+                <a href="?page={{ results.next_page_number }}&q={{ query }}">Next</a>
+                <a href="?page={{ results.paginator.num_pages }}&q={{ query }}">Last</a>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 
-
 <script>
+    // Show loading spinner on recipe cards
+    function showRecipeLoading(element) {
+        element.classList.add('loading');
+    }
+
     // Initialize star ratings when page loads
     document.addEventListener('DOMContentLoaded', function() {
         const starRatings = document.querySelectorAll('.star-rating');

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}New Recipe{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'recipes/css/recipe_list.css' %}">
+<link rel="stylesheet" href="{% static 'recipes/css/upload_recipe.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="form-title">New Recipe</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Title:</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <ul class="errorlist">
+                    {% for error in form.title.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Description:</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <ul class="errorlist">
+                    {% for error in form.description.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.ingredients.id_for_label }}">Ingredients:</label>
+            {{ form.ingredients }}
+            {% if form.ingredients.errors %}
+                <ul class="errorlist">
+                    {% for error in form.ingredients.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.instructions.id_for_label }}">Instructions(Steps):</label>
+            {{ form.instructions }}
+            {% if form.instructions.errors %}
+                <ul class="errorlist">
+                    {% for error in form.instructions.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="form-row">
+            <div class="form-col">
+                <label for="{{ form.servings.id_for_label }}">Servings:</label>
+                {{ form.servings }}
+                {% if form.servings.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.servings.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="form-col">
+                <label for="{{ form.prep_time.id_for_label }}">Preparation Time (minutes):</label>
+                {{ form.prep_time }}
+                {% if form.prep_time.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.prep_time.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Create Recipe</button>
+    </form>
+</div>
+{% endblock %}

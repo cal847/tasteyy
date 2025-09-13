@@ -30,6 +30,7 @@
     background: white;
     box-shadow: 0.3rem 0.3rem 0.2rem rgb(218, 197, 197);
     transition: all 0.3s ease-in-out;
+    position: relative;
 }
 
 .recipe-card:hover {
