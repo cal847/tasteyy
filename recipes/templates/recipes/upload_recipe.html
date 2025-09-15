@@ -4,7 +4,6 @@
 {% block title %}New Recipe{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'recipes/css/recipe_list.css' %}">
 <link rel="stylesheet" href="{% static 'recipes/css/upload_recipe.css' %}">
 {% endblock %}
 
@@ -14,7 +13,8 @@
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        
+
+        <!-- Title -->
         <div class="form-group">
             <label for="{{ form.title.id_for_label }}">Title:</label>
             {{ form.title }}
@@ -27,6 +27,7 @@
             {% endif %}
         </div>
 
+        <!-- Description -->
         <div class="form-group">
             <label for="{{ form.description.id_for_label }}">Description:</label>
             {{ form.description }}
@@ -39,6 +40,20 @@
             {% endif %}
         </div>
 
+        <!-- Extra Tips -->
+        <div class="form-group">
+            <label for="{{ form.extra_tips.id_for_label }}">Extra Tips:</label>
+            {{ form.extra_tips }}
+            {% if form.extra_tips.errors %}
+                <ul class="errorlist">
+                    {% for error in form.extra_tips.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Ingredients -->
         <div class="form-group">
             <label for="{{ form.ingredients.id_for_label }}">Ingredients:</label>
             {{ form.ingredients }}
@@ -51,8 +66,9 @@
             {% endif %}
         </div>
 
+        <!-- Instructions -->
         <div class="form-group">
-            <label for="{{ form.instructions.id_for_label }}">Instructions(Steps):</label>
+            <label for="{{ form.instructions.id_for_label }}">Instructions (Steps):</label>
             {{ form.instructions }}
             {% if form.instructions.errors %}
                 <ul class="errorlist">
@@ -63,6 +79,7 @@
             {% endif %}
         </div>
 
+        <!-- Servings & Prep Time — Compact Side-by-Side -->
         <div class="form-row">
             <div class="form-col">
                 <label for="{{ form.servings.id_for_label }}">Servings:</label>
@@ -70,6 +87,17 @@
                 {% if form.servings.errors %}
                     <ul class="errorlist">
                         {% for error in form.servings.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <div class="form-col">
+                <label for="{{ form.cooking_time.id_for_label }}">Cooking Time (minutes):</label>
+                {{ form.cooking_time }}
+                {% if form.cooking_time.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.cooking_time.errors %}
                             <li>{{ error }}</li>
                         {% endfor %}
                     </ul>
@@ -86,6 +114,20 @@
                     </ul>
                 {% endif %}
             </div>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="form-group">
+            <label for="{{ form.image.id_for_label }}">Upload Image (optional):</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+                <ul class="errorlist">
+                    {% for error in form.image.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <small class="help-text">Accepted formats: JPG, PNG, GIF. Max size: 5MB.</small>
         </div>
 
         <button type="submit" class="submit-btn">Create Recipe</button>

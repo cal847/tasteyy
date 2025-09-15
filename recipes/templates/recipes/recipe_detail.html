@@ -117,6 +117,17 @@
         <p> {{ recipe.servings }} servings</p>
     </div>
 
+    <!-- Diet bubbles section -->
+    <div class="diet-bubbles">
+        {% if recipe.diet %}
+            {% for diet_item in recipe.diet %}
+                <div class="diet-bubble">{{ diet_item }}</div>
+            {% endfor %}
+        {% elif recipe.diet_type %}
+            <div class="diet-bubble">{{ recipe.diet_type }}</div>
+        {% endif %}
+    </div>
+
     <div class="nutritional-value">
         <h1> Nutritional Values </h1>
         {% if nut_v %}
@@ -156,6 +167,16 @@
             {% else %}
                 <p>Ingredients unavailable</p>
             {% endif %}
+        </div>
+
+        <div class="tips">
+            {% if recipe.tips %}
+                <h1>Extra Tips</h1>
+                <p> {{ recipe.tips }}</p>
+            {% else %}
+                <h1>Extra Tips</h1>
+                <p>No additional tips available for this recipe.</p>
+            {% endif %}          
         </div>
         
         <div class="instructions">

@@ -15,7 +15,7 @@
     <header>
         <nav class="nav-bar">
             {% if user.is_authenticated %}
-                {% if request.resolver_match.url_name == "profile_view" or request.resolver_match.url_name == "upload-recipe"%}
+                {% if request.resolver_match.url_name == "profile_view" or request.resolver_match.url_name == "recipes:upload-recipe"%}
                     <p class="title">Hello, {{ user.username }}</p>
                 {% else %}
                     <a href="{% url 'home' %}" class="title">Tasteyy</a>

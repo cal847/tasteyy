@@ -22,7 +22,7 @@
     }
 }
 
-.details-header h1, .nutritional-value h1 {
+.details-header h1, .nutritional-value h1, .tips h1 {
     text-align: center;
     padding: 5px;
     font-size: 1.8rem;
@@ -50,14 +50,64 @@
 }
 
 .details-wrapper p {
-    border-right:2px solid rgb(127, 7, 2);
+    border-right: 2px solid rgb(127, 7, 2);
     padding-right: 30px;
     font-size: 1.2rem;
 }
 
+/* Diet bubbles styling */
+.diet-bubbles {
+    position: absolute;
+    top: 270px;
+    left: 600px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-width: 500px;
+}
+
+.diet-bubble {
+    background: linear-gradient(135deg, rgba(122, 6, 6, 0.1), rgba(122, 6, 6, 0.2));
+    border: 2px solid rgba(122, 6, 6, 0.3);
+    border-radius: 25px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #7a0606;
+    text-transform: capitalize;
+    box-shadow: 0 4px 12px rgba(122, 6, 6, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.diet-bubble::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+}
+
+.diet-bubble:hover::before {
+    opacity: 1;
+    transform: rotate(45deg) translateX(100%);
+}
+
+.diet-bubble:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(122, 6, 6, 0.2);
+    border-color: rgba(122, 6, 6, 0.5);
+}
+
 .nutritional-value {
     position: absolute;
-    top: 250px;
+    top: 330px;
     left: 700px;
     background: #fff;
     padding: 14px;
@@ -77,7 +127,7 @@
 }
 
 .nutritional-value ol li {
-    list-style: none; 
+    list-style: none;
     counter-increment: nutrition-counter;
     position: relative;
     padding-left: 30px;
@@ -90,8 +140,6 @@
     position: absolute;
     left: 0;
     top: 5px;
-    
-    /* Style the numbers */
     color: rgba(122, 6, 6, 0.8);
     font-weight: bold;
     font-size: 1.1em;
@@ -104,29 +152,63 @@
     justify-content: center;
     font-size: 0.9em;
 }
- 
-.ingredients,
-.instructions {
+
+.recipe-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.ingredients, .instructions {
     padding: 40px;
     background: linear-gradient(135deg, #fdf6f0 0%, #fff 100%);
     border-radius: 20px;
     box-shadow: 0 12px 30px rgba(122, 6, 6, 0.12);
-    max-width: 900px;
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(122, 6, 6, 0.15);
 }
 
-.instructions {
-    margin: 10px auto 0;
+.tips {
+    padding: 20px;
+    background: #fff;
+    margin: 10px;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(122, 6, 6, 0.1);
+    position: relative;
+    height: fit-content;
 }
 
-.ingredients {
-    margin: 30px auto 5px;
+.tips h1 {
+    color: #7a0606;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    position: relative;
+    padding-bottom: 10px;
 }
 
-.ingredients::before,
-.instructions::before {
+.tips h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, rgba(122, 6, 6, 0.3), rgba(122, 6, 6, 0.8), rgba(122, 6, 6, 0.3));
+    border-radius: 2px;
+}
+
+.tips p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+}
+
+.ingredients::before, .instructions::before {
     content: '';
     position: absolute;
     top: -50px;
@@ -138,8 +220,7 @@
     z-index: 0;
 }
 
-.ingredients::after,
-.instructions::after {
+.ingredients::after, .instructions::after {
     content: '';
     position: absolute;
     bottom: -50px;
@@ -151,8 +232,7 @@
     z-index: 0;
 }
 
-.ingredients h1,
-.instructions h1 {
+.ingredients h1, .instructions h1 {
     text-align: center;
     margin-bottom: 30px;
     color: #7a0606;
@@ -163,8 +243,7 @@
     padding-bottom: 15px;
 }
 
-.ingredients h1::after,
-.instructions h1::after {
+.ingredients h1::after, .instructions h1::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -190,4 +269,54 @@
 .instructions ol p {
     padding: 4px;
     font-size: 1.2rem;
+}
+
+.summary {
+    grid-column: 1 / -1;
+    margin-bottom: 20px;
+}
+
+.summary p {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: #555;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Star rating styles */
+.star-rating {
+    display: flex;
+    gap: 3px;
+}
+
+.star {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.star-outline, .star-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    fill: #ddd;
+}
+
+.star-fill {
+    fill: #ffc107;
+    clip-path: inset(0 100% 0 0);
+}
+
+.rating-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rating-text {
+    font-weight: bold;
+    color: #7a0606;
 }

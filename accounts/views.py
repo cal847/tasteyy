@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.forms import AuthenticationForm
-from .forms import RegistrationForm, AddRecipeForm
+from .forms import RegistrationForm
 from recipes.models import Recipe
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -72,22 +72,6 @@ def profile_view(request):
     recipes = Recipe.objects.filter(author=user)
 
     return render(request, "accounts/profile.html", {"recipes": recipes})
-
-def upload_recipe(request):
-    if request.method == "POST":
-        form = AddRecipeForm(request.POST, request.FILES)
-        if form.is_valid():
-            new_recipe = form.save(commit=False)
-            new_recipe.user = user
-            new_recipe.save()
-            messages.success(request, "Successfully added {new_recipe.title}")
-            return redirect('accounts:profile_view')
-        else:
-            messages.error(request, "Please fix the errors below")
-    else:
-        form = AddRecipeForm()
-
-    return render(request, "recipes/upload_recipe.html", {"form": form})
 
 class LoginView(generics.GenericAPIView):
     """Custom login view"""

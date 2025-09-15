@@ -51,10 +51,13 @@ def fetch_recipes(self, offset=0, batch_size=10):
 
     data = response.json().get("results", [])
 
+    # Only save recipes with complete information to prevent burning out api calls
+    saved_recipes = 0
     for item in data:
-        save_or_update_recipe(item)
+        if save_or_update_recipe(item):
+            saved_recipes += 1
 
-    print(f"Fetched {len(data)} recipes from offset {offset}.")
+    print(f"Saved {saved_recipes} out of {len(data)} recipes from offset {offset}.")
 
     updated_calls = cache.get(cache_key, 0)
 
@@ -91,7 +94,7 @@ def save_or_update_recipe(item):
 
     if missing_ingredients or missing_instructions or missing_nutrition:
         print(f"Skipping recipe {item['id']}: Incomplete information")
-        return false
+        return False
 
     # --- Category ---
     category = "none"

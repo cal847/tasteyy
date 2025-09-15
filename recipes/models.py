@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db.models import Avg
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
-
+from django.contrib.postgres.fields import ArrayField
 
 class Recipe(models.Model):
     CATEGORY_CHOICES = [
@@ -39,14 +39,15 @@ class Recipe(models.Model):
         null=True,
         related_name="recipes",
     )
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="none")
+    category = ArrayField(models.CharField(max_length=20, choices=CATEGORY_CHOICES, default=list))
     api_id = models.PositiveIntegerField(
         help_text="ID from Spoonacular", null=True, blank=True
     )
-    diet = models.CharField(max_length=20, choices=DIET_CHOICES, default="none")
+    diet = ArrayField(models.CharField(max_length=20, choices=DIET_CHOICES, default=list))
     title = models.TextField()
     slug = models.SlugField(unique=True, blank=True, max_length=500)
     description = models.TextField(blank=True, null=True)
+    extra_tips = models.TextField(blank=True, null=True)
     servings = models.PositiveIntegerField()
     ingredients = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="recipes/", blank=True, null=True)

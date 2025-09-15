@@ -1,68 +1,211 @@
+/* === Container & Animation === */
 .container {
     max-width: 700px;
     margin: 30px auto;
-    background: #f9f1e6;
+    background: linear-gradient(135deg, #fdf6f0 0%, #fff 100%);
     border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 8px 25px rgba(139, 69, 19, 0.15);
-    border: 2px solid #d4a574;
-}
-.form-title {
-    text-align: center;
-    color: #140901;
-    font-size: 24px;
-    margin-bottom: 25px;
-    text-decoration: underline;
-    text-decoration-color: #68310a;
+    box-shadow: 0 12px 30px rgba(122, 6, 6, 0.12);
+    padding: 40px;
+    border: 1px solid rgba(122, 6, 6, 0.15);
+    position: relative;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeInUp 0.8s ease-out forwards;
 }
 
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* .container::before,
+.container::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+}
+
+.container::before {
+    top: -50px;
+    left: -50px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(122, 6, 6, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+} */
+
+/* .container::after {
+    bottom: -50px;
+    right: -50px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(122, 6, 6, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+} */
+
+/* === Form Title === */
+.form-title {
+    text-align: center;
+    color: #7a0606;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.form-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, rgba(122, 6, 6, 0.3), rgba(122, 6, 6, 0.8), rgba(122, 6, 6, 0.3));
+    border-radius: 2px;
+}
+
+/* === General Form Group === */
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .form-group label {
     display: block;
-    color: #8b4513;
-    font-size: 16px;
-    margin-bottom: 8px;
-    font-weight: bold;
+    color: #7a0606;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
 }
 
+/* === Short Text Input (Title) === */
 .form-group input[type="text"],
-.form-group textarea {
+.form-input-text {
     width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #d4a574;
-    border-radius: 8px;
+    padding: 12px 16px;
+    border: 2px solid rgba(122, 6, 6, 0.15);
+    border-radius: 10px;
     background: #ffffff;
-    font-size: 14px;
+    font-size: 1.1rem;
     font-family: inherit;
-    color: #8b4513;
-    transition: border-color 0.3s ease;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
 .form-group input[type="text"]:focus,
-.form-group textarea:focus {
+.form-input-text:focus {
     outline: none;
-    border-color: #d2691e;
-    box-shadow: 0 0 5px rgba(210, 105, 30, 0.3);
+    border-color: rgba(122, 6, 6, 0.5);
+    box-shadow: 0 0 0 3px rgba(122, 6, 6, 0.1);
 }
 
-.form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
+.form-group input[type="text"]::placeholder,
+.form-input-text::placeholder {
     color: #b8860b;
     font-style: italic;
 }
 
+/* === Compact Number Inputs (Servings, Cooking Time) === */
+.form-col input[type="number"],
+.form-input-number {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid rgba(122, 6, 6, 0.15);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-col input[type="number"]:focus,
+.form-input-number:focus {
+    outline: none;
+    border-color: rgba(122, 6, 6, 0.5);
+    box-shadow: 0 0 0 2px rgba(122, 6, 6, 0.1);
+}
+
+.form-col input[type="number"]::placeholder,
+.form-input-number::placeholder {
+    color: #d4a574;
+    font-style: italic;
+}
+
+/* === Large Text Areas (Description, Ingredients, Instructions) === */
+.form-group textarea,
+.form-textarea {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid rgba(122, 6, 6, 0.15);
+    border-radius: 12px;
+    background: #ffffff;
+    font-size: 1.1rem;
+    font-family: inherit;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    min-height: 140px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.form-group textarea:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: rgba(122, 6, 6, 0.5);
+    box-shadow: 0 0 0 3px rgba(122, 6, 6, 0.1);
+}
+
+.form-group textarea::placeholder,
+.form-textarea::placeholder {
+    color: #b8860b;
+    font-style: italic;
+}
+
+/* === Image Upload Field === */
+.form-group input[type="file"],
+.form-input-file {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px dashed rgba(122, 6, 6, 0.2);
+    border-radius: 10px;
+    background: #fdf6f0;
+    font-size: 1rem;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-group input[type="file"]:focus,
+.form-input-file:focus {
+    outline: none;
+    border-color: rgba(122, 6, 6, 0.5);
+    box-shadow: 0 0 0 2px rgba(122, 6, 6, 0.1);
+}
+
+.help-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.9rem;
+    color: #7a0606;
+}
+
+/* === Servings & Cooking Time Row === */
 .form-row {
     display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 25px;
+    align-items: flex-start;
 }
 
 .form-col {
@@ -70,53 +213,49 @@
 }
 
 .form-col label {
-    color: #8b4513;
-    font-size: 14px;
-    margin-bottom: 8px;
+    color: #b8860b;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: -0.1px;
+    margin-bottom: 4px;
     display: block;
-    font-weight: bold;
 }
 
-.form-col input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 2px solid #d4a574;
-    border-radius: 8px;
-    background: #ffffff;
-    font-size: 14px;
-    color: #8b4513;
-}
-
+/* === Submit Button === */
 .submit-btn {
     width: 100%;
-    padding: 15px;
+    padding: 16px;
     background: linear-gradient(135deg, #5a2a08 0%, #612c08 100%);
     color: white;
     border: none;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: bold;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    letter-spacing: -0.3px;
 }
 
 .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(210, 105, 30, 0.4);
+    box-shadow: 0 8px 25px rgba(122, 6, 6, 0.2);
 }
 
 .submit-btn:active {
     transform: translateY(0);
 }
 
-/* Django form errors styling */
+/* === Django Form Errors === */
 .errorlist {
     list-style: none;
     color: #dc3545;
-    font-size: 14px;
-    margin-top: 5px;
+    font-size: 1rem;
+    margin-top: 6px;
+    padding: 0;
 }
 
 .errorlist li {
-    margin-bottom: 3px;
+    margin-bottom: 4px;
+    color: #b81e1e;
+    font-weight: 500;
 }

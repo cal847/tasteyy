@@ -7,9 +7,12 @@ from django.contrib.auth import get_user_model
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RecipeSerializer
 from .filters import RecipeFilter
+from .forms import AddRecipeForm
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.core.paginator import Paginator
+from django.contrib import messages
+from django.shortcuts import redirect
 
 User = get_user_model()
 
@@ -53,6 +56,41 @@ def recipe_detail(request, slug):
     instructions = [inst.strip() for inst in instructions if inst.strip()]
 
     return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "nut_v": nut_v, "ingredients": ingredients, "instructions": instructions},)
+
+def upload_recipe(request):
+    """
+    Takes user uploads and saves them to the database
+    """
+    if request.method == 'POST':
+        form = AddRecipeForm(request.POST, request.FILES)
+        if form.is_valid():
+            cleaned = form.cleaned_data
+            category = cleaned.get('category', [])
+            diet = cleaned.get('diet', [])
+
+            recipe = Recipe.objects.create(
+                author=request.user if request.user.is_authenticated else None,
+                title=cleaned['title'],
+                category=category,
+                diet=diet,
+                description=cleaned['description'] or "",  # Ensure empty string if None
+                ingredients=cleaned['ingredients'],
+                instructions=cleaned['instructions'],
+                servings=cleaned['servings'],
+                cooking_time=cleaned['cooking_time'],
+                image=cleaned['image'],
+                image_url=None,
+                prep_time=cleaned['prep_time'],
+            )
+
+            messages.success(request, "Recipe Uploaded Succesfully!")
+            return redirect('recipes:recipe_detail', slug=recipe.slug)
+        else:
+            messages.error(request, "Error:")
+    else:
+        form = AddRecipeForm()
+    
+    return render(request, 'recipes/upload_recipe.html', {'form': form})
 
 # def recipe_list(request):
 #     """

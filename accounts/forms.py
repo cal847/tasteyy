@@ -25,10 +25,3 @@ class RegistrationForm(UserCreationForm):
         self.fields['password1'].help_text = None
         self.fields['password2'].help_text = None
 
-class AddRecipeForm(forms.ModelForm):
-    """
-    Form to handle adding new recipes.
-    """
-    class Meta:
-        model = Recipe
-        fields = ['title', 'image', 'description', 'ingredients', 'instructions', 'servings', 'cooking_time']
