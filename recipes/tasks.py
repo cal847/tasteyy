@@ -1,5 +1,6 @@
 import re
 import requests
+import time
 from celery import shared_task
 from .models import Recipe, NutritionalValue
 from django.conf import settings
@@ -7,6 +8,7 @@ from datetime import date
 from django.core.cache import cache
 
 API_URL = "https://api.spoonacular.com/recipes/complexSearch"
+RECIPE_INFO_URL = "https://api.spoonacular.com/recipes/{id}/information"
 API_KEY = settings.SPOONACULAR_API_KEY
 
 
@@ -51,13 +53,13 @@ def fetch_recipes(self, offset=0, batch_size=10):
 
     data = response.json().get("results", [])
 
-    # Only save recipes with complete information to prevent burning out api calls
-    saved_recipes = 0
-    for item in data:
-        if save_or_update_recipe(item):
-            saved_recipes += 1
+    # # Only save recipes with complete information to prevent burning out api calls
+    # saved_recipes = 0
+    # for item in data:
+    #     if save_or_update_recipe(item):
+    #         saved_recipes += 1
 
-    print(f"Saved {saved_recipes} out of {len(data)} recipes from offset {offset}.")
+    # print(f"Saved {saved_recipes} out of {len(data)} recipes from offset {offset}.")
 
     updated_calls = cache.get(cache_key, 0)
 
@@ -84,17 +86,93 @@ def clean_text(text):
 
     return clean.strip()
 
-def save_or_update_recipe(item):
-    """Extract recipe details and save to DB"""
+def fetch_detailed_info(recipe_id):
+    """
+    Fetch detailed recipe information from Spoonacular API.
+    The API_URL has limited information such as ingredietns. Therefore, if the info is not available, hit the second url
+    """
 
+    # Checks if API calls are still available
+    today = date.today()
+    cache_key = f"spoonacular_calls_{today}"
+
+    calls_used = cache.get(cache_key, 0)
+    daily_limit = 50
+    
+    if calls_used >= daily_limit:
+        print(f"Daily API limit reached, cannot fetch detailed info for recipe {recipe_id}")
+        return None
+    
+    try:
+        cache.incr(cache_key)
+
+        url = RECIPE_INFO_URL.format(id=recipe_id)
+        params = {
+            "apiKey": API_KEY,
+            "includeNutrition": True
+        }
+
+        response = requests.get(url, params=params, timeout=5)
+        response.raise_for_status()
+
+        time.sleep(0.2)
+
+        return response.json()
+    except requests.RequestException as e:
+        print(f"Error fetching detailed recipe: {e}")
+        return None
+
+
+def save_or_update_recipe(item):
+    """Extract recipe details and save to DB with fallback fetching"""
+
+    recipe_id = item["id"]
+    s
     # Skip recipe if ingredient is missing
     missing_ingredients = not item.get("extendedIngredients")
     missing_instructions = not item.get("analyzedInstructions") and not item.get("instructions")
     missing_nutrition = "nutrition" not in item
-
+    
     if missing_ingredients or missing_instructions or missing_nutrition:
-        print(f"Skipping recipe {item['id']}: Incomplete information")
-        return False
+        print(f"Recipe {recipe_id} missing some information. Attempting to fetch...")
+
+        detailed_info = fetch_detailed_info(recipe_id)
+
+        if detailed_info:
+            # Update ingredients if missing
+            if missing_ingredients:
+                if detailed_info.get("extendedIngredients"):
+                    item["extendedIngredients"] = detailed_info["extendedIngredients"]
+                    missing_ingredients = False
+                    print(f"Found ingredients for recipe {recipe_id}")
+            
+            # Update instructions if missing
+            if missing_instructions:
+                if detailed_info.get("analyzedInstructions") or detailed_info.get("instructions"):
+                    if detailed_info.get("analyzedInstructions"):
+                        item["analyzedInstructions"] = detailed_info["analyzedInstructions"]
+                    if detailed_info.get("instructions"):
+                        item["instructions"] = detailed_info["instructions"]
+                    missing_instructions = False
+                    print(f"Found instructions for recipe {recipe_id}")
+            
+            # Update nutrition if missing
+            if missing_nutrition and detailed_info.get("nutrition"):
+                item["nutrition"] = detailed_info["nutrition"]
+                missing_nutrition = False
+                print(f"Found nutrition info for recipe {recipe_id}")
+            
+            # Update other fields that might be more complete in detailed info
+            for field in ["summary", "readyInMinutes", "servings", "image", "title"]:
+                if detailed_info.get(field) and (not item.get(field) or len(str(detailed_info[field])) > len(str(item.get(field, "")))):
+                    item[field] = detailed_info[field]
+        else:
+            print("Could not fetch detailed information for {recipe_id}")
+    
+    # Skip if still missing critical information
+    if missing_ingredients or missing_instructions:
+        print(f"Skipping recipe {recipe_id}: Still missing critical information after detailed fetch")
+        return False 
 
     # --- Category ---
     category = "none"
@@ -132,7 +210,7 @@ def save_or_update_recipe(item):
 
     elif item.get("instructions"):
         raw = item["instructions"]
-        clean = clean_html_text(raw)
+        clean = clean_text(raw)
 
         # Split by numbered steps if they exist
         if re.search(r'\d+\.', clean):
@@ -149,7 +227,7 @@ def save_or_update_recipe(item):
     instructions = "\n".join(instructions)
 
     # --- Clean description ---
-    description = clean_html_text(item.get("summary", ""))
+    description = clean_text(item.get("summary", ""))
 
     # --- Save Recipe ---
     recipe, _ = Recipe.objects.update_or_create(
