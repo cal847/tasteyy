@@ -1,4 +1,4 @@
-{% extends 'accounts/base.html' %}
+{% extends 'registration/base.html' %}
 
 {% block title %}Log In {% endblock %}
 
@@ -23,6 +23,10 @@
 
 			<button type="Submit" class="btn">Log In</button>
 		</form>
+
+		<p>
+    		<a href="{% url 'accounts:password_reset' %}" style="font-size: 1.1rem;">Forgot password?</a>
+		</p>
 
 		<p> Don't have an account? <a href="{% url 'accounts:register' %}">Register</a>
 	</div>

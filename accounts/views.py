@@ -62,7 +62,7 @@ def register_form_view(request):
     else:
         form = RegistrationForm()
         
-    return render(request, 'accounts/register.html', {'form': form})
+    return render(request, 'registration/register.html', {'form': form})
 
 def profile_view(request):
     """
@@ -71,7 +71,7 @@ def profile_view(request):
     user = request.user
     recipes = Recipe.objects.filter(author=user)
 
-    return render(request, "accounts/profile.html", {"recipes": recipes})
+    return render(request, "registration/profile.html", {"recipes": recipes})
 
 class LoginView(generics.GenericAPIView):
     """Custom login view"""
@@ -122,7 +122,7 @@ def login_form_view(request):
     else:
         form = AuthenticationForm()
     
-    return render(request, "accounts/login.html", {"form": form})
+    return render(request, "registration/login.html", {"form": form})
 
 class LogoutView(APIView):
     """Logout endpoint"""

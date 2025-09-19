@@ -25,7 +25,7 @@ def fetch_recipes(self, offset=0, batch_size=10):
     try:
         calls_used = cache.incr(cache_key)
     except ValueError:
-        cache.set(cache_key, 86400)
+        cache.set(cache_key, 1, 86400)
         calls_used = 1
 
     if calls_used > daily_limit:
@@ -53,20 +53,20 @@ def fetch_recipes(self, offset=0, batch_size=10):
 
     data = response.json().get("results", [])
 
-    # # Only save recipes with complete information to prevent burning out api calls
-    # saved_recipes = 0
-    # for item in data:
-    #     if save_or_update_recipe(item):
-    #         saved_recipes += 1
+    # Only save recipes with complete information to prevent burning out api calls
+    saved_recipes = 0
+    for item in data:
+        if save_or_update_recipe(item):
+            saved_recipes += 1
 
-    # print(f"Saved {saved_recipes} out of {len(data)} recipes from offset {offset}.")
+    print(f"Saved {saved_recipes} out of {len(data)} recipes from offset {offset}.")
 
     updated_calls = cache.get(cache_key, 0)
 
     if updated_calls < daily_limit:
         fetch_recipes.apply_async(args=[offset + batch_size], countdown=5)
 
-    return f"Successfully fetched {len(data)} recipes. Daily limit reached: {updated_calls}/{daily_limit}"
+    return f"Successfully fetched {len(data)} recipes. Calls used: {updated_calls}/{daily_limit}"
 
 def clean_text(text):
     """
@@ -104,8 +104,6 @@ def fetch_detailed_info(recipe_id):
         return None
     
     try:
-        cache.incr(cache_key)
-
         url = RECIPE_INFO_URL.format(id=recipe_id)
         params = {
             "apiKey": API_KEY,
@@ -127,7 +125,7 @@ def save_or_update_recipe(item):
     """Extract recipe details and save to DB with fallback fetching"""
 
     recipe_id = item["id"]
-    s
+    
     # Skip recipe if ingredient is missing
     missing_ingredients = not item.get("extendedIngredients")
     missing_instructions = not item.get("analyzedInstructions") and not item.get("instructions")
@@ -175,17 +173,17 @@ def save_or_update_recipe(item):
         return False 
 
     # --- Category ---
-    category = "none"
+    category = ["none"]
     for dt in item.get("dishTypes", []):
         if dt.lower() in dict(Recipe.CATEGORY_CHOICES):
-            category = dt.lower()
+            category = [dt.lower()]
             break
 
     # --- Diet ---
-    diet = "none"
+    diet = ["none"]
     for d in item.get("diets", []):
         if d.lower().replace("-", "_") in dict(Recipe.DIET_CHOICES):
-            diet = d.lower().replace("-", "_")
+            diet = [d.lower().replace("-", "_")]
             break
 
     # --- Ingredients ---
