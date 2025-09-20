@@ -93,6 +93,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "recipe_app.wsgi.application"
 
+# EMAIL CONFIG
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

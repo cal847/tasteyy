@@ -112,7 +112,7 @@
             {% endif %}
             <p>({{ recipe.total_ratings }})</p>
         </div>
-        <p> {{ recipe.category }}</p>
+        <p> {{ recipe.display_category }}</p>
         <p> {{ recipe.cooking_time }} min</p>
         <p> {{ recipe.servings }} servings</p>
     </div>
@@ -149,9 +149,14 @@
         {% endif %}
     </div>
     
-    <div class="recipe-grid">
+    <div class="recipe-grid rotating-bg"  style="
+        --bg1: url('{% static 'recipes/images/bg2.jpg' %}');
+        --bg2: url('{% static 'recipes/images/bg3.jpg' %}');
+        --bg3: url('{% static 'recipes/images/bg4.jpg' %}');
+    ">
         {% if recipe.description %}
         <div class="summary">
+            <h1>Description</h1>
             <p> {{ recipe.description }}</p>            
         </div>
         {% endif %}

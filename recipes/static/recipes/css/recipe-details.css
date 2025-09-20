@@ -1,3 +1,4 @@
+/* ===== MAIN CONTAINER ===== */
 .details-container {
     background: #ffffffbe;
     padding: 10px 20px 10px 10px;
@@ -9,20 +10,41 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.details-header {
-    display: flex;
-    flex-direction: row;
-    animation: headerFadeIn 1.2s ease-out 0.3s both;
-}
-
+/* ===== ANIMATIONS ===== */
 @keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
     to {
         opacity: 1;
         transform: translateX(0);
     }
 }
 
-.details-header h1, .nutritional-value h1, .tips h1 {
+@keyframes rotateBackground {
+    0%, 10% { background-image: var(--bg1); }
+    33%, 43% { background-image: var(--bg2); }
+    66%, 76% { background-image: var(--bg3); }
+    100% { background-image: var(--bg1); }
+}
+
+.rotating-bg {
+    animation: rotateBackground 15s infinite ease-in-out;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    transition: background-image 1s ease-in-out;
+}
+
+/* ===== HEADER SECTION ===== */
+.details-header {
+    display: flex;
+    flex-direction: row;
+    animation: fadeInRight 1s ease-in forwards;
+}
+
+.details-header h1 {
     text-align: center;
     padding: 5px;
     font-size: 1.8rem;
@@ -37,16 +59,17 @@
     justify-self: start;
 }
 
+/* ===== DETAILS WRAPPER ===== */
 .details-wrapper {
     position: absolute;
     top: 200px;
     left: 600px;
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: 50px;
     align-items: center;
     justify-content: center;
-    gap: 50px;
+    animation: fadeInRight 1.2s ease-in forwards;
 }
 
 .details-wrapper p {
@@ -55,7 +78,44 @@
     font-size: 1.2rem;
 }
 
-/* Diet bubbles styling */
+/* ===== STAR RATING ===== */
+.star-rating {
+    display: flex;
+    gap: 3px;
+}
+
+.star {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.star-outline, .star-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    fill: #fff;
+}
+
+.star-fill {
+    fill: #ffc107;
+    clip-path: inset(0 100% 0 0);
+}
+
+.rating-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rating-text {
+    font-weight: bold;
+    color: #7a0606;
+}
+
+/* ===== DIET BUBBLES ===== */
 .diet-bubbles {
     position: absolute;
     top: 270px;
@@ -105,6 +165,7 @@
     border-color: rgba(122, 6, 6, 0.5);
 }
 
+/* ===== NUTRITIONAL VALUES ===== */
 .nutritional-value {
     position: absolute;
     top: 330px;
@@ -114,6 +175,13 @@
     margin: 10px;
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(122, 6, 6, 0.1);
+    animation: fadeInRight 1.2s ease-out forwards;
+}
+
+.nutritional-value h1 {
+    text-align: center;
+    padding: 5px;
+    font-size: 1.8rem;
 }
 
 .nutritional-value ol {
@@ -142,7 +210,6 @@
     top: 5px;
     color: rgba(122, 6, 6, 0.8);
     font-weight: bold;
-    font-size: 1.1em;
     background: rgba(122, 6, 6, 0.1);
     border-radius: 50%;
     width: 20px;
@@ -153,14 +220,43 @@
     font-size: 0.9em;
 }
 
+/* ===== RECIPE GRID ===== */
 .recipe-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, auto);
     gap: 30px;
     margin-top: 50px;
+    padding: 20px;
+    border-radius: 12px;
 }
 
-.ingredients, .instructions {
+/* ===== GRID ITEM POSITIONING ===== */
+.summary {
+    display: flex;
+    flex-direction: column;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    align-items: stretch;
+}
+
+.ingredients {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+}
+
+.instructions {
+    grid-column: 1 / 2;
+    grid-row: 3 / 4;
+}
+
+.tips {
+    grid-column: 2 / 3;
+    grid-row: 4 / 5;
+}
+
+/* ===== SHARED GRID ITEM STYLES ===== */
+.ingredients, .instructions, .summary, .tips {
     padding: 40px;
     background: linear-gradient(135deg, #fdf6f0 0%, #fff 100%);
     border-radius: 20px;
@@ -168,47 +264,11 @@
     position: relative;
     overflow: hidden;
     border: 1px solid rgba(122, 6, 6, 0.15);
-}
-
-.tips {
-    padding: 20px;
-    background: #fff;
-    margin: 10px;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(122, 6, 6, 0.1);
-    position: relative;
     height: fit-content;
 }
 
-.tips h1 {
-    color: #7a0606;
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    position: relative;
-    padding-bottom: 10px;
-}
-
-.tips h1::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(to right, rgba(122, 6, 6, 0.3), rgba(122, 6, 6, 0.8), rgba(122, 6, 6, 0.3));
-    border-radius: 2px;
-}
-
-.tips p {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: #333;
-    margin: 0;
-}
-
-.ingredients::before, .instructions::before {
+/* Decorative elements for all grid items */
+.ingredients::before, .instructions::before, .summary::before, .tips::before {
     content: '';
     position: absolute;
     top: -50px;
@@ -220,7 +280,7 @@
     z-index: 0;
 }
 
-.ingredients::after, .instructions::after {
+.ingredients::after, .instructions::after, .summary::after, .tips::after {
     content: '';
     position: absolute;
     bottom: -50px;
@@ -232,7 +292,14 @@
     z-index: 0;
 }
 
-.ingredients h1, .instructions h1 {
+/* Ensure content stays above decorative elements */
+.ingredients > *, .instructions > *, .summary > *, .tips > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== GRID ITEM HEADINGS ===== */
+.ingredients h1, .instructions h1, .summary h1, .tips h1 {
     text-align: center;
     margin-bottom: 30px;
     color: #7a0606;
@@ -243,7 +310,7 @@
     padding-bottom: 15px;
 }
 
-.ingredients h1::after, .instructions h1::after {
+.ingredients h1::after, .instructions h1::after, .summary h1::after, .tips h1::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -255,6 +322,11 @@
     border-radius: 2px;
 }
 
+/* ===== GRID ITEM CONTENT ===== */
+.summary p, .ingredients ol {
+    font-size: 1.12rem;
+}
+
 .ingredients ul {
     list-style: none;
     padding: 0;
@@ -264,59 +336,53 @@
 .instructions ol {
     padding: 0;
     margin: 0;
+    text-align: left;
 }
 
 .instructions ol p {
     padding: 4px;
+    text-align: left;
     font-size: 1.2rem;
 }
 
-.summary {
-    grid-column: 1 / -1;
-    margin-bottom: 20px;
+.tips p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
 }
 
-.summary p {
-    font-size: 1.2rem;
-    line-height: 1.7;
-    color: #555;
-    text-align: center;
-    font-style: italic;
-}
-
-/* Star rating styles */
-.star-rating {
-    display: flex;
-    gap: 3px;
-}
-
-.star {
-    position: relative;
-    width: 24px;
-    height: 24px;
-}
-
-.star-outline, .star-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 24px;
-    height: 24px;
-    fill: #fff;
-}
-
-.star-fill {
-    fill: #ffc107;
-    clip-path: inset(0 100% 0 0);
-}
-
-.rating-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.rating-text {
-    font-weight: bold;
-    color: #7a0606;
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .recipe-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .summary, .ingredients, .instructions, .tips {
+        grid-column: 1;
+    }
+    
+    .summary { grid-row: 1; }
+    .ingredients { grid-row: 2; }
+    .instructions { grid-row: 3; }
+    .tips { grid-row: 4; }
+    
+    .details-wrapper, .diet-bubbles, .nutritional-value {
+        position: relative;
+        left: auto;
+        top: auto;
+        margin-top: 20px;
+    }
+    
+    .details-header {
+        flex-direction: column;
+    }
+    
+    .details-header img {
+        width: 100%;
+        height: auto;
+        max-width: 400px;
+        align-self: center;
+    }
 }

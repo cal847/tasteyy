@@ -18,7 +18,7 @@
                 {% endif %}
                 <div class="recipe-info">
                     <h3>{{ recipe.title }}</h3>
-                    <p>Category: {{ recipe.category }}</p>
+                    <p>Category: {{ recipe.display_category }}</p>
                     <p>Cooking Time: {{ recipe.cooking_time }} min</p>
                     <div class="rating-container">
                         {% if recipe.avg_rating %}
@@ -126,11 +126,12 @@
                 {% elif recipe.image_url %}
                     <img src="{{ recipe.image_url }}" alt="{{recipe.title}}">
                 {% else %}
-                    <img src="{% static 'recipes/images/default.jpg' %}" alt="{{recipe.title}}">
+                    <img src="{% static 'recipes/images/default.png' %}" alt="{{recipe.title}}">
                 {% endif %}
                 <div class="recipe-info">
                     <h3>{{ recipe.title }}</h3>
-                    <p>Category: {{ recipe.category }}</p>
+                    <p>Category: {{ recipe.display_category }}
+                    </p>
                     <p>Cooking Time: {{ recipe.cooking_time }} min</p>
                     <div class="rating-container">
                         {% if recipe.avg_rating %}

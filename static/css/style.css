@@ -88,3 +88,65 @@ input[type="search"]::placeholder, .nav-bar form i {
     left: 20px;
     font-size: 1rem;
 }
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    border: none;
+    outline: none;
+    background: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.hamburger i {
+    color: white;
+    font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .nav-bar {
+        height: 80px;
+        border-radius: 0 0 3px 3px;
+    }
+
+    .nav-bar ul.accordion {
+        visibility: hidden;
+        position: absolute;
+        top: 80px;
+        left: 20px;
+        right: 20px;
+        width: auto;
+        padding: 10px;
+        overflow: hidden;
+        background: rgba(97, 61, 27, 0.95);
+        border-radius: 15px;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: visibility 1s ease, transform 1s ease;
+    }
+
+    .nav-bar ul.accordion.active {
+        display: flex;
+        flex-direction: column;
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 500px;
+        transition: visibility 0s 0.5s, opacity 0.3s ease, transform 0.5s ease;
+    }
+
+    .nav-bar ul.accordion li {
+        margin: 10px 0;
+    }
+    .nav-bar form input, .form-input {
+        width: 300px;
+    }
+
+    .hamburger {
+        display: flex;
+        margin-left: auto;
+    }
+}

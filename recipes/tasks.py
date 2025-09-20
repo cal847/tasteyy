@@ -239,7 +239,7 @@ def save_or_update_recipe(item):
             "ingredients": ingredients,
             "servings": item.get("servings", 0),
             "instructions": instructions,
-            "description": item.get("summary", ""),
+            "description": description,
             "author": None,
         },
     )

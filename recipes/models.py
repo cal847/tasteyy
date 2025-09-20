@@ -82,6 +82,21 @@ class Recipe(models.Model):
         """Returns the total number of ratings for a recipe"""
         return self.ratings.count()
 
+    def display_category(self):
+        """Returns the category in a human readable format eg Main Course instead of ['main course']"""
+        if not self.category:
+            return "None"
+        
+        category_map = dict(self.CATEGORY_CHOICES)
+        return ",".join([category_map.get(cat, "Unknown") for cat in self.category])
+        
+    def display_diet(self):
+        """Returns the diet in a human readable format eg Main Course instead of ['main course']"""
+        if not self.diet:
+            return "None"
+        
+        diet_map = dict(self.DIET_CHOICES)
+        return ",".join([category_map.get(cat, "Unknown") for cat in self.diet])
 
 class NutritionalValue(models.Model):
     """Stores nutritional value for each recipe"""

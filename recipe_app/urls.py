@@ -18,7 +18,7 @@ urlpatterns = [
     ),
 
     # user urls`
-    path("accounts/", include("accounts.urls")),
+    path("accounts/", include("accounts.urls", namespace='accounts')),
 
     # admin urls
     path("api/admin/", include("admin.urls")),

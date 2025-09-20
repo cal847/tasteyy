@@ -15,12 +15,12 @@
                 {% elif result.image %}
                     <img src="{{ result.image.url }}" alt="{{ result.title }}">
                 {% else %}
-                    <img src="{% static 'recipes/images/default.jpg' %}" alt="{{ result.title }}">
+                    <img src="{% static 'recipes/images/default.png' %}" alt="{{ result.title }}">
                 {% endif %}
 
                 <div class="recipe-info">
                     <h3>{{ result.title }}</h3>
-                    <p>Category: {{ result.category }}</p>
+                    <p>Category: {{ result.display_category }}</p>
                     <p> Cooking Time: {{ result.cooking_time }} min</p>
                     <div class="rating-container">
                         {% if result.avg_rating %}
