@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 50px auto; text-align: center;">
+    <h2>Are you sure you want to delete?</h2>
+    <p><strong>{{ recipe.title }}</strong></p>
+    <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" style="max-width: 100%; margin: 20px 0;">
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'recipes:recipe_detail' recipe.slug %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

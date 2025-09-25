@@ -1,14 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap');
+
+/* ---------- Reset ---------- */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
+/* ---------- Base ---------- */
 body {
     background: linear-gradient(135deg, #f5e6d3 0%, #e8d5c4 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding-top: 100px;
 }
+
+/* ---------- Navbar ---------- */
 .nav-bar {
     background: linear-gradient(135deg, hsl(34, 46%, 27%), #613d1b);
     display: grid;
@@ -17,20 +23,16 @@ body {
     max-width: 100%;
     margin: 0 auto;
     padding: 20px 25px;
-    box-shadow: 0 5px 6px grey;
     border-radius: 0 0 80px 80px;
+    box-shadow: 0 5px 6px rgba(104, 53, 11, 0.5);
     position: fixed;
-    top:0;
-    left:0;
-    right:0;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 10000;
 }
-.nav-bar ul {
-    display: flex;
-    list-style: none;
-    gap: 30px;
-    justify-self: end;
-}
+
+/* ---------- Title ---------- */
 .title {
     color: #fff;
     justify-self: start;
@@ -39,46 +41,84 @@ body {
     font-weight: bold;
     text-decoration: none;
 }
-.nav-bar ul a {
-    text-decoration: none;
-    color: #fff;
-    font-size: 1.2rem;
+
+/* ---------- Nav Links ---------- */
+.nav-bar ul {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+    justify-self: end;
+}
+
+.accordion {
+    padding: 0 15px 0;
+    margin-right: 50px;
 }
 
 .nav-bar ul li {
-    transition: all 0.3s ease;   
+    transition: all 1s ease;
 }
 
 .nav-bar ul li:hover {
-    scale: 1.1;
+    scale: 1.0;
 }
 
+.nav-bar ul a {
+    position: relative;
+    text-decoration: none;
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 5px;
+}
+
+.nav-bar ul a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%) scaleX(0);
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #c48650 0%, #8d3e0a 50%, #dba779 100%);
+    transition: transform 0.3s ease;
+}
+
+.nav-bar ul a:hover::after {
+    transform: translateX(-50%) scaleX(1);
+}
+
+/* ---------- Search ---------- */
 .nav-bar form {
     justify-self: center;
     position: relative;
 }
 
-.nav-bar form input, .form-input {
-    outline: none;
-    border: none;
-    border-radius: 20px;
-    padding: 10px;
-    height: 40px;
+.nav-bar form input,
+.form-input {
     width: 350px;
+    height: 40px;
+    padding: 10px;
+    border: none;
+    outline: none;
+    border-radius: 20px;
+
     text-align: center;
     font-weight: bold;
     font-size: 1rem;
+    font-family: "Kalam", cursive;
+
     /* background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px); */
-    font-family: "Kalam", cursive;
 }
 
-.nav-bar form input:focus, .form-input:focus{
+.nav-bar form input:focus,
+.form-input:focus {
     box-shadow: 0 3px 6px rgba(127, 6, 2, 0.205);
 }
 
-input[type="search"]::placeholder, .nav-bar form i {
+input[type="search"]::placeholder,
+.nav-bar form i {
     color: rgb(127, 7, 2);
 }
 
@@ -89,6 +129,7 @@ input[type="search"]::placeholder, .nav-bar form i {
     font-size: 1rem;
 }
 
+/* ---------- Hamburger ---------- */
 .hamburger {
     display: none;
     flex-direction: column;
@@ -104,6 +145,7 @@ input[type="search"]::placeholder, .nav-bar form i {
     font-size: 1.5rem;
 }
 
+/* ---------- Mobile (≤768px) ---------- */
 @media (max-width: 768px) {
     .nav-bar {
         height: 80px;
@@ -111,37 +153,65 @@ input[type="search"]::placeholder, .nav-bar form i {
     }
 
     .nav-bar ul.accordion {
-        visibility: hidden;
+        display: flex;
+        flex-direction: column;
         position: absolute;
         top: 80px;
         left: 20px;
         right: 20px;
-        width: auto;
-        padding: 10px;
-        overflow: hidden;
+        width: 200px;
+
         background: rgba(97, 61, 27, 0.95);
         border-radius: 15px;
-        transition: opacity 0.3s ease, transform 0.3s ease;
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+
+        overflow: hidden;
+        max-height: 0;
         opacity: 0;
+        visibility: hidden;
         transform: translateY(-20px);
-        transition: visibility 1s ease, transform 1s ease;
+
+        transition:
+            visibility 0s 0.5s ease,
+            opacity 0.3s ease,
+            transform 1s ease;
     }
 
     .nav-bar ul.accordion.active {
-        display: flex;
-        flex-direction: column;
-        visibility: visible;
-        opacity: 1;
-        transform: translateY(0);
         max-height: 500px;
-        transition: visibility 0s 0.5s, opacity 0.3s ease, transform 0.5s ease;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+
+        transition:
+            visibility 0s,
+            opacity 0.3s ease,
+            transform 0.5s ease;
     }
 
     .nav-bar ul.accordion li {
         margin: 10px 0;
+        /* border: 5px solid red; */
     }
-    .nav-bar form input, .form-input {
+
+    .nav-bar ul.accordion a {
+        display: block;
+        padding: 14px 0;
+        text-align: center;
+
+        color: white;
+        font-size: 1.1rem;
+        text-decoration: none;
+
+        transition: color 0.2s;
+    }
+
+    .nav-bar ul.accordion a:hover {
+        color: #f5e6d3;
+    }
+
+    .nav-bar form input,
+    .form-input {
         width: 300px;
     }
 

@@ -117,7 +117,7 @@
         <p> {{ recipe.servings }} servings</p>
     </div>
 
-    <!-- Diet bubbles section
+    <!-- Diet bubbles section  -->
     <div class="diet-bubbles">
         {% if recipe.diet %}
             {% for diet_item in recipe.diet %}
@@ -126,7 +126,7 @@
         {% elif recipe.diet_type %}
             <div class="diet-bubble">{{ recipe.diet_type }}</div>
         {% endif %}
-    </div> -->
+    </div>
 
     <div class="nutritional-value">
         <h1> Nutritional Values </h1>
@@ -149,55 +149,124 @@
         {% endif %}
     </div>
     
-    <div class="recipe-grid rotating-bg"  style="
-        --bg1: url('{% static 'recipes/images/bg2.jpg' %}');
-        --bg2: url('{% static 'recipes/images/bg3.jpg' %}');
-        --bg3: url('{% static 'recipes/images/bg4.jpg' %}');
-    ">
-        {% if recipe.description %}
-        <div class="summary">
-            <h1>Description</h1>
-            <p> {{ recipe.description }}</p>            
-        </div>
-        {% endif %}
-
-        <div class="ingredients">
-            <h1> Ingredients </h1>
-            {% if ingredients %}
-                <ol>
-                    {% for ingredient in ingredients%}
-                        <p>{{ ingredient }}</p>
-                    {% endfor %}
-                </ol>
-            {% else %}
-                <p>Ingredients unavailable</p>
+    <div class="wrapper rotating-bg" style="
+            --bg1: url('{% static 'recipes/images/bg2.jpg' %}');
+            --bg2: url('{% static 'recipes/images/bg3.jpg' %}');
+            --bg3: url('{% static 'recipes/images/bg4.jpg' %}');
+        ">
+        <div class="recipe-grid"  >
+            {% if recipe.description %}
+            <div class="summary">
+                <h1>Description</h1>
+                <p> {{ recipe.description }}</p>            
+            </div>
             {% endif %}
-        </div>
 
-        <div class="tips">
-            {% if recipe.tips %}
-                <h1>Extra Tips</h1>
-                <p> {{ recipe.tips }}</p>
-            {% else %}
-                <h1>Extra Tips</h1>
-                <p>No additional tips available for this recipe.</p>
-            {% endif %}          
+            <div class="ingredients">
+                <h1> Ingredients </h1>
+                {% if ingredients %}
+                    <ol>
+                        {% for ingredient in ingredients%}
+                            <p>{{ ingredient }}</p>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <p>Ingredients unavailable</p>
+                {% endif %}
+            </div>
+
+            <div class="tips">
+                {% if recipe.tips %}
+                    <h1>Extra Tips</h1>
+                    <p> {{ recipe.tips }}</p>
+                {% else %}
+                    <h1>Extra Tips</h1>
+                    <p>No additional tips available for this recipe.</p>
+                {% endif %}          
+            </div>
+            
+            <div class="instructions">
+                <h1> Instructions </h1>
+                {% if instructions %}
+                    <ol >
+                        {% for instruction in instructions%}
+                            <p>{{ instruction }}</p>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <p>Instructions unavailable</p>
+                {% endif %}
+            </div>
         </div>
-        
-        <div class="instructions">
-            <h1> Instructions </h1>
-            {% if instructions %}
-                <ol >
-                    {% for instruction in instructions%}
-                        <p>{{ instruction }}</p>
-                    {% endfor %}
-                </ol>
-            {% else %}
-                <p>Instructions unavailable</p>
-            {% endif %}
-        </div>
+        <!-- Replace the empty <div class="comments"></div> and <div class="ratings"></div> with this -->
+            <div class="cr-wrapper">
+                <!-- Comments Section -->
+                <div class="comments">
+                    <h1>Comments</h1>
+                    
+                    <!-- Comment form for top-level comments -->
+                    {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'recipes:add_comment' recipe.slug %}" class="comment-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ comment_form.content }}
+                        </div>
+                        <button type="submit" class="submit-btn">Post Comment</button>
+                    </form>
+                    {% else %}
+                    <p><a href="{% url 'login' %}">Log in</a> to comment.</p>
+                    {% endif %}
+                    
+                    <!-- Scrollable comments container -->
+                    <div class="comments-scroll">
+                        {% for comment in comments %}
+                            {% include "recipes/comment_node.html" with comment=comment recipe=recipe %}
+                        {% empty %}
+                        <p>No comments yet. Be the first!</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Ratings Section -->
+                <div class="ratings">
+                    <h1>Rate This Recipe</h1>
+                    
+                    <!-- Current rating display -->
+                    <div class="current-rating">
+                        <p>Average Rating: <strong>{{ recipe.avg_rating|floatformat:1 }}</strong> ({{ recipe.total_ratings }} ratings)</p>
+                    </div>
+                    
+                    <!-- Rating form with slider -->
+                    {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'recipes:rate_recipe' recipe.slug %}" class="rating-form">
+                        {% csrf_token %}
+                        <div class="slider-container">
+                            <input type="range" 
+                                name="rating" 
+                                min="-5" 
+                                max="5" 
+                                step="0.1"
+                                value="0"
+                                class="rating-slider"
+                                id="rating-slider">
+                            <div class="slider-labels">
+                                <span>-5</span>
+                                <span>0</span>
+                                <span>5</span>
+                            </div>
+                            <div class="slider-value">
+                                <span id="slider-value">0</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="submit-btn">Submit Rating</button>
+                    </form>
+                    {% else %}
+                    <p><a href="{% url 'login' %}">Log in</a> to rate this recipe.</p>
+                    {% endif %}
+                </div>
+            </div>
+
     </div>
-    
 </div>
 <script>
     // Initialize star ratings when page loads

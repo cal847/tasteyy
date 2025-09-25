@@ -130,7 +130,9 @@
             <small class="help-text">Accepted formats: JPG, PNG, GIF. Max size: 5MB.</small>
         </div>
 
-        <button type="submit" class="submit-btn">Create Recipe</button>
+        <button type="submit" class="submit-btn">
+            {% if editing %}Update Recipe {% else %}Create Recipe{% endif %}
+        </button>
     </form>
 </div>
 {% endblock %}

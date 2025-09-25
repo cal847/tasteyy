@@ -47,6 +47,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             "total_ratings",
             "nutritional_value",
         ]
+        read_only_fields = ['authot']
 
     def get_average_rating(self, obj):
         """Returns the average rating for a recipe"""
@@ -55,3 +56,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_total_ratings(self, obj):
         """Returns the total number of ratings for a recipe"""
         return obj.total_ratings()
+    
+    def create(self, validated_data):
+        """Sets author to current user"""
+        validated_data['author'] = self.context['request'].user
+        return super().create(validated_data)

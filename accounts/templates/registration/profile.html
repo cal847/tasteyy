@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{% static 'recipes/css/recipe_list.css' %}">
 
 <div class="container">
-    <h2>Hello {{ user.username }}</h2>
+    <h2>Hello, {{ user.username }}!!</h2>
 
     <!-- Upload Button -->
     <div class="upload-container">
@@ -26,11 +26,72 @@
                     <h3>{{ recipe.title }}</h3>
                     <p>Category: {{ recipe.category }}</p>
                     <p>Cooking Time: {{ recipe.cooking_time }} min</p>
+                    <p>Prep Time: {{ recipe.prep_time }} min</p>
                 </div>
             </a>
+            {% if user.is_authenticated and recipe.author == user %}
+                <div class="edit-delete">
+                    <a href="{% url 'recipes:edit_recipe' recipe.slug %}" class="edit-btn"><i class="fa-regular fa-pen-to-square"></i></a>
+                    <a href="#" 
+                        class="delete-btn" 
+                        data-recipe-title="{{ recipe.title }}" 
+                        data-delete-url="{% url 'recipes:delete_recipe' recipe.slug %}">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                    <!-- <a href="{% url 'recipes:delete_recipe' recipe.slug %}" class="delete-btn"><i class="fa-solid fa-trash"></i></a> -->
+                </div>
+            {% endif %}
         {% empty %}
             <p>You haven't uploaded any recipes yet.</p>
         {% endfor %}
+        <!-- Custom Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content">
+                <h3>Confirm Delete</h3>
+                <p id="modal-message"></p>
+                <div class="modal-actions">
+                <button id="cancelBtn" class="btn cancel">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn danger">Delete</button>
+                </form>
+                <!-- <a id="confirmDelete" href="#" class="btn danger">Delete</a> -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("deleteModal");
+    const modalMessage = document.getElementById("modal-message");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const deleteForm = document.getElementById("deleteForm");
+
+    // Open modal when delete button is clicked
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const recipeTitle = this.getAttribute("data-recipe-title");
+            const deleteUrl = this.getAttribute("data-delete-url");
+
+            modalMessage.textContent = `Do you want to delete "${recipeTitle}"?`;
+            deleteForm.action = deleteUrl;
+            modal.style.display = "flex";
+        });
+    });
+
+    // Cancel button closes modal
+    cancelBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // Click outside modal closes it
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+});
+</script>
 {% endblock %}

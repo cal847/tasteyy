@@ -181,10 +181,14 @@ def save_or_update_recipe(item):
 
     # --- Diet ---
     diet = ["none"]
+    normalized_diet = []
+
     for d in item.get("diets", []):
-        if d.lower().replace("-", "_") in dict(Recipe.DIET_CHOICES):
-            diet = [d.lower().replace("-", "_")]
-            break
+        norm = d.lower().replace("-", "_").replace(" ", "_")
+        if norm in dict(Recipe.DIET_CHOICES):
+            normalized_diet.append(norm)
+        if normalized_diet:
+            diet = normalized_diet
 
     # --- Ingredients ---
     raw_ingredients = item.get("extendedIngredients", [])

@@ -119,14 +119,16 @@
 .diet-bubbles {
     position: absolute;
     top: 270px;
-    left: 600px;
+    left: 650px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     max-width: 500px;
+    animation: fadeInRight 1s ease-in forwards;
 }
 
 .diet-bubble {
+    margin: 0 auto;
     background: linear-gradient(135deg, rgba(122, 6, 6, 0.1), rgba(122, 6, 6, 0.2));
     border: 2px solid rgba(122, 6, 6, 0.3);
     border-radius: 25px;
@@ -139,6 +141,7 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    animation: fadeInRight 1s ease-in forwards;
 }
 
 .diet-bubble::before {
@@ -224,7 +227,7 @@
 .recipe-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, auto);
+    grid-template-rows: repeat(5, auto);
     gap: 30px;
     margin-top: 50px;
     padding: 20px;
@@ -255,8 +258,96 @@
     grid-row: 4 / 5;
 }
 
+/* ===== COMMENTS & RATINGS WRAPPER ===== */
+.cr-wrapper {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+/* ===== COMMENTS ===== */
+.comments {
+    flex: 2;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    border: 2px solid rgba(122, 6, 6, 0.3);
+    border-radius: 12px;
+    background: #fffdfcbe;
+    box-shadow: 0 4px 10px rgba(122, 6, 6, 0.1);
+}
+
+.comment {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-left: 3px solid #7a0606;
+    background: rgba(122, 6, 6, 0.05);
+    border-radius: 8px;
+}
+
+.reply {
+    margin-left: 20px;
+    padding: 8px;
+    border-left: 2px solid #b14c4c;
+    background: rgba(122, 6, 6, 0.08);
+    border-radius: 6px;
+    margin-top: 8px;
+}
+
+.comment-list::-webkit-scrollbar {
+    width: 6px;
+}
+.comment-list::-webkit-scrollbar-thumb {
+    background: #7a0606;
+    border-radius: 10px;
+}
+
+/* ===== RATINGS ===== */
+.ratings {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid rgba(122, 6, 6, 0.3);
+    border-radius: 12px;
+    background: #fffdfcbe;
+    box-shadow: 0 4px 10px rgba(122, 6, 6, 0.1);
+    text-align: center;
+}
+
+.ratings h1 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: #7a0606;
+}
+
+.slider {
+    width: 100%;
+    margin: 10px 0;
+}
+
+#slider-value {
+    font-weight: bold;
+    color: #7a0606;
+}
+
+/* ===== BUTTONS ===== */
+.btn, .btn-reply {
+    background: #7a0606;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.3s;
+}
+
+.btn:hover, .btn-reply:hover {
+    background: #b14c4c;
+}
+
+
 /* ===== SHARED GRID ITEM STYLES ===== */
-.ingredients, .instructions, .summary, .tips {
+.ingredients, .instructions, .summary, .tips, .comments, .ratings {
     padding: 40px;
     background: linear-gradient(135deg, #fdf6f0 0%, #fff 100%);
     border-radius: 20px;
@@ -268,7 +359,7 @@
 }
 
 /* Decorative elements for all grid items */
-.ingredients::before, .instructions::before, .summary::before, .tips::before {
+.ingredients::before, .instructions::before, .summary::before, .tips::before, .comments::before, .ratings::before {
     content: '';
     position: absolute;
     top: -50px;
@@ -280,7 +371,7 @@
     z-index: 0;
 }
 
-.ingredients::after, .instructions::after, .summary::after, .tips::after {
+.ingredients::after, .instructions::after, .summary::after, .tips::after, .comments::after, .ratings::after {
     content: '';
     position: absolute;
     bottom: -50px;
@@ -293,13 +384,13 @@
 }
 
 /* Ensure content stays above decorative elements */
-.ingredients > *, .instructions > *, .summary > *, .tips > * {
+.ingredients > *, .instructions > *, .summary > *, .tips > * , .comments > *, .ratings > * {
     position: relative;
     z-index: 1;
 }
 
 /* ===== GRID ITEM HEADINGS ===== */
-.ingredients h1, .instructions h1, .summary h1, .tips h1 {
+.ingredients h1, .instructions h1, .summary h1, .tips h1, .comments h1, .ratings h1 {
     text-align: center;
     margin-bottom: 30px;
     color: #7a0606;
@@ -310,7 +401,7 @@
     padding-bottom: 15px;
 }
 
-.ingredients h1::after, .instructions h1::after, .summary h1::after, .tips h1::after {
+.ingredients h1::after, .instructions h1::after, .summary h1::after, .tips h1::after, .comments h1::after, .ratings h1::after {
     content: '';
     position: absolute;
     bottom: 0;

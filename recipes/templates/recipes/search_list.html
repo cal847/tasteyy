@@ -22,6 +22,7 @@
                     <h3>{{ result.title }}</h3>
                     <p>Category: {{ result.display_category }}</p>
                     <p> Cooking Time: {{ result.cooking_time }} min</p>
+                    <p>Prep Time: {{ recipe.prep_time }} min</p>
                     <div class="rating-container">
                         {% if result.avg_rating %}
                             <div class="star-rating" data-rating="{{ result.avg_rating }}">

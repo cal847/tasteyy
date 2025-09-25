@@ -4,6 +4,8 @@ from .models import Recipe
 from ratings.models import Rating
 from django.db.models import Avg, Count
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RecipeSerializer
 from .filters import RecipeFilter
@@ -13,6 +15,9 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.shortcuts import redirect
+from comments.forms import CommentForm, ReplyForm
+from comments.models import Comment
+from ratings.models import Rating
 
 User = get_user_model()
 
@@ -47,6 +52,8 @@ def recipe_detail(request, slug):
 
     nut_v = getattr(recipe, "nutritional_value", None)
 
+    comments = recipe.comments.select_related('author').order_by('-created_at')
+
     # Split by new lines
     ingredients = recipe.ingredients.split("\n") if recipe.ingredients else []
     instructions = recipe.instructions.split("\n") if recipe.instructions else []
@@ -55,7 +62,7 @@ def recipe_detail(request, slug):
     ingredients = [ing.strip() for ing in ingredients if ing.strip()]
     instructions = [inst.strip() for inst in instructions if inst.strip()]
 
-    return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "nut_v": nut_v, "ingredients": ingredients, "instructions": instructions},)
+    return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "nut_v": nut_v, "ingredients": ingredients, "instructions": instructions, "comments": comments},)
 
 def upload_recipe(request):
     """
@@ -92,13 +99,140 @@ def upload_recipe(request):
     
     return render(request, 'recipes/upload_recipe.html', {'form': form})
 
-# def recipe_list(request):
-#     """
-#     Renders recipes
-#     """
-    
+@login_required
+def edit_recipe(request, slug):
+    """
+    Allows authors to edit their recipes
+    """
+    recipe = get_object_or_404(Recipe, slug=slug)
 
-#     return render(request, "recipes/recipe_list.html", {"recipes": recipes})
+    # Ensures only authors can edit
+    if recipe.author != request.user:
+        return redirect('recipes:recipe_detail', slug=slug)
+    
+    if request.method == 'POST':
+        form = AddRecipeForm(request.POST, request.FILES, instance=recipe)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Recipe updated successfully")
+            return redirect('accounts:profile_view')
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = AddRecipeForm(instance=recipe)
+    
+    return render(request, 'recipes/upload_recipe.html', {
+        'form': form,
+        'recipe': recipe
+    })
+
+@login_required
+@require_POST
+def delete_recipe(request, slug):
+    """
+    Allows authors to delete their recipes
+    """
+    recipe = get_object_or_404(Recipe, slug=slug)
+
+    # Ensures only authors can delete
+    if recipe.author != request.user:
+        return redirect('recipes:recipe_detail', slug=slug)
+    
+    if request.method == 'POST':
+        recipe.delete()
+        messages.success(request, "Recipe deleted successfully")
+        return redirect('accounts:profile_view')
+    
+    return redirect('accounts:profile_view')
+
+@login_required
+def add_comment(request, slug):
+    """
+    View to add comments
+    """
+    recipe = get_object_or_404(Recipe, slug=slug)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.recipe = recipe
+            comment.author = request.user
+            comment.save()
+            messages.success(request, "Comment added!")
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = CommentForm()
+
+    return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "comment_form": form})
+
+@login_required
+def add_reply(request, slug, parent_id):
+    """
+    Allows users to reply to comments
+    """
+    recipe = get_object_or_404(Recipe, slug=slug)
+    parent = get_object_or_404(Comment, id=parent_id, recipe=recipe)
+    if request.method == 'POST':
+        form = ReplyForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.recipe = recipe
+            reply.author = request.user
+            reply.parent = parent
+            reply.save()
+            messages.success(request, "Reply added!")
+            return redirect("recipe_detail", pk=recipe.id)
+        else:
+            messages.error(request, "Please correct the error below.")
+    
+    return redirect('recipes:recipe_detail', slug=slug)
+
+@login_required
+def delete_comment(reques, slug, comment_id):
+    """
+    Allows authors to delete their comments
+    """
+    recipe = get_object_or_404(Recipe, slug=slug)
+    comment = get_object_or_404(Comment, id=comment_id, recipe=recipe)
+
+    if comment.author != request.user:
+        return redirect('recipes:recipe_detail', slug=slug)
+
+    if request.method == 'POST':
+        comment.delete()
+        messages.success(request, "Comment deleted!")
+        return redirect('recipes:recipe_detail', slug=slug)
+    
+    return redirect('recipes:recipe_detail', slug=slug)
+
+@login_required
+def rate_recipe(request, slug):
+    recipe = get_object_or_404(Recipe, slug=slug)
+
+    if request.method == "POST":
+        value = request.POST.get("rating")
+        try:
+            value = int(value)
+            if value < -5 or value > 5:
+                raise ValueError("Invalid rating value")
+
+            # Update if user already rated, otherwise create new
+            rating, created = Rating.objects.update_or_create(
+                recipe=recipe,
+                user=request.user,
+                defaults={"value": value},
+            )
+
+            if created:
+                messages.success(request, f"You rated {recipe.title} with {value}.")
+            else:
+                messages.success(request, f"Your rating for {recipe.title} was updated to {value}.")
+
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid rating. Please pick between -5 and 5.")
+
+    return redirect("recipes:recipe_detail", slug=recipe.slug)
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """Determines permissions of users"""

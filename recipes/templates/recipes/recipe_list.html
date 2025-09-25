@@ -20,6 +20,7 @@
                     <h3>{{ recipe.title }}</h3>
                     <p>Category: {{ recipe.display_category }}</p>
                     <p>Cooking Time: {{ recipe.cooking_time }} min</p>
+                    <p>Prep Time: {{ recipe.prep_time }} min</p>
                     <div class="rating-container">
                         {% if recipe.avg_rating %}
                             <div class="star-rating" data-rating="{{ recipe.avg_rating }}">
@@ -130,9 +131,9 @@
                 {% endif %}
                 <div class="recipe-info">
                     <h3>{{ recipe.title }}</h3>
-                    <p>Category: {{ recipe.display_category }}
-                    </p>
+                    <p>Category: {{ recipe.display_category }}</p>
                     <p>Cooking Time: {{ recipe.cooking_time }} min</p>
+                    <p>Prep Time: {{ recipe.prep_time }} min</p>
                     <div class="rating-container">
                         {% if recipe.avg_rating %}
                             <div class="star-rating" data-rating="{{ recipe.avg_rating }}">

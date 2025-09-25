@@ -1,6 +1,5 @@
 from django import forms
-from recipes.models import Recipe
-
+from .models import Recipe
 
 class AddRecipeForm(forms.ModelForm):
     """
@@ -96,3 +95,4 @@ class AddRecipeForm(forms.ModelForm):
                 'style': 'height: 40px; font-size: 1rem; padding: 8px 12px; border-radius: 8px;',
             }),
         }               
+

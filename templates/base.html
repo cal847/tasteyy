@@ -16,7 +16,7 @@
         <nav class="nav-bar">
             {% if user.is_authenticated %}
                 {% if request.resolver_match.url_name == "profile_view" or request.resolver_match.url_name == "recipes:upload-recipe"%}
-                    <p class="title">Hello, {{ user.username }}</p>
+                    <a href="{% url 'home' %}" class="title">Hello, {{ user.username }}!!</a>
                 {% else %}
                     <a href="{% url 'home' %}" class="title">Tasteyy</a>
                 {% endif %}
@@ -33,11 +33,33 @@
 
             <ul class="accordion">
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'accounts:profile_view' %}"><i class="fas fa-user"></i> My Account</a></li>
-                    <li><a href="{% url 'accounts:logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    {% if request.resolver_match.url_name != "home" %}
+                        <li>
+                            <a href="{% url 'home' %}">
+                                <!-- <i class="fa-solid fa-house"></i> --> Home
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'accounts:profile_view' %}">
+                            <!-- <i class="fas fa-user"></i> --> Profile
+                        </a>
+                    </li>
+                    <li><a href="{% url 'accounts:logout' %}">
+                           <!-- <i class="fas fa-sign-out-alt"></i> -->Logout
+                        </a>
+                    </li>
                 {% else %}
-                    <li><a href="{% url 'accounts:login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-                    <li><a href="{% url 'accounts:register' %}"><i class="fas fa-user-plus"></i> Register</a></li>
+                    <li>
+                        <a href="{% url 'accounts:login' %}">
+                            <!-- <i class="fas fa-sign-in-alt"></i>-->Login
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'accounts:register' %}">
+                            <!-- <i class="fas fa-user-plus"></i>  -->Register
+                        </a>
+                    </li>
                 {% endif %}
             </ul>
 
