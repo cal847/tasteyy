@@ -198,74 +198,30 @@
                 {% endif %}
             </div>
         </div>
-        <!-- Replace the empty <div class="comments"></div> and <div class="ratings"></div> with this -->
-            <div class="cr-wrapper">
-                <!-- Comments Section -->
-                <div class="comments">
-                    <h1>Comments</h1>
-                    
-                    <!-- Comment form for top-level comments -->
-                    {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'recipes:add_comment' recipe.slug %}" class="comment-form">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            {{ comment_form.content }}
-                        </div>
-                        <button type="submit" class="submit-btn">Post Comment</button>
-                    </form>
-                    {% else %}
-                    <p><a href="{% url 'login' %}">Log in</a> to comment.</p>
-                    {% endif %}
-                    
-                    <!-- Scrollable comments container -->
-                    <div class="comments-scroll">
-                        {% for comment in comments %}
-                            {% include "recipes/comment_node.html" with comment=comment recipe=recipe %}
-                        {% empty %}
-                        <p>No comments yet. Be the first!</p>
-                        {% endfor %}
-                    </div>
+        <div class="cr-wrapper">
+            <!-- Comments Section -->
+            <div class="comments">
+                <h1>Comments</h1>
+                <div id="comment-list">
+                    {% for comment in comments %}
+                        {% include "recipes/_comment.html" with comment=comment %}
+                    {% empty %}
+                        <p>Be the first to comment!!</p>
+                    {% endfor %}
                 </div>
-                
-                <!-- Ratings Section -->
-                <div class="ratings">
-                    <h1>Rate This Recipe</h1>
-                    
-                    <!-- Current rating display -->
-                    <div class="current-rating">
-                        <p>Average Rating: <strong>{{ recipe.avg_rating|floatformat:1 }}</strong> ({{ recipe.total_ratings }} ratings)</p>
-                    </div>
-                    
-                    <!-- Rating form with slider -->
-                    {% if user.is_authenticated %}
-                    <form method="post" action="{% url 'recipes:rate_recipe' recipe.slug %}" class="rating-form">
-                        {% csrf_token %}
-                        <div class="slider-container">
-                            <input type="range" 
-                                name="rating" 
-                                min="-5" 
-                                max="5" 
-                                step="0.1"
-                                value="0"
-                                class="rating-slider"
-                                id="rating-slider">
-                            <div class="slider-labels">
-                                <span>-5</span>
-                                <span>0</span>
-                                <span>5</span>
-                            </div>
-                            <div class="slider-value">
-                                <span id="slider-value">0</span>
-                            </div>
-                        </div>
-                        <button type="submit" class="submit-btn">Submit Rating</button>
-                    </form>
-                    {% else %}
-                    <p><a href="{% url 'login' %}">Log in</a> to rate this recipe.</p>
-                    {% endif %}
-                </div>
+                <form id="comment-form" data-url="{% url 'recipes:add_comment' recipe.slug %}" method="post">
+                    {% csrf_token %}
+                    {{ comment_form.content }}
+                    {{ comment_form.non_field_errors }}
+                    <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
             </div>
-
+                
+            <!-- Ratings Section -->
+            <div class="ratings">
+                <h1>Ratings</h1>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -294,6 +250,63 @@
                 }
             });
         });
+
+        // AJAX to prevent page refresh when a comment is added
+        const commentForm = document.getElementById("comment-form");
+        if (commentForm) {
+            commentForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                postForm(commentForm, "#comment-list", true);
+            });
+        }
+
+        // Handle reply forms
+        document.body.addEventListener("submit", function (e) {
+            if (e.target.classList.contains("reply-form")) {
+                e.preventDefault();
+                const form = e.target;
+                const repliesDiv = form.closest(".comment").querySelector(".replies");
+                postForm(form, repliesDiv, false);
+            }
+        });
+
+        // Toggle reply form
+        document.body.addEventListener("click", function (e) {
+            if (e.target.classList.contains("reply-toggle")) {
+                const form = e.target.parentElement.querySelector(".reply-form");
+                form.style.display = form.style.display === "none" ? "block" : "none";
+            }
+        });
+
+        function postForm(form, targetSelector, prepend) {
+            const url = form.dataset.url;
+            const data = new FormData(form);
+
+            fetch(url, {
+                method: "POST",
+                headers: {"X-CSRFToken": data.get("csrfmiddlewaretoken")},
+                body: data,
+            })
+            .then(res => res.json())
+            .then(json => {
+                if (json.success) {
+                    if (prepend) {
+                        document.querySelector(targetSelector).insertAdjacentHTML("afterbegin", json.html);
+                    } else {
+                        targetSelector.insertAdjacentHTML("beforeend", json.html);
+                    }
+                    form.reset();
+
+                    // Only hide reply forms, not the main form
+                    if (form.classList.contains("reply-form")) {
+                        form.style.display = "none";
+                    }
+                    
+                }
+            })
+            .catch(err => console.error(err));
+        }
+
     });
 </script>
 

@@ -1,0 +1,19 @@
+<div class="comment" id="comment-{{ comment.id }}">
+    <p><b>{{ comment.author }}</b>: {{ comment.content }}</p>
+    <small>{{ comment.created_at|timesince }} ago</small>
+
+    <!-- Reply Form -->
+    <form class="reply-form" data-url="{% url 'recipes:add_reply' comment.recipe.slug comment.id %}" method="post" style="display:none;">
+        {% csrf_token %}
+        {{ comment_form.content }}
+        <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+    <button class="reply-toggle">Reply</button>
+
+    <!-- Nested Replies -->
+    <div class="replies">
+        {% for reply in comment.replies.all %}
+            {% include "recipes/_comment.html" with comment=reply %}
+        {% endfor %}
+    </div>
+</div>

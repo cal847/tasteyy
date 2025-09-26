@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     RecipeViewSet, search_recipes, upload_recipe, recipe_detail,
-    edit_recipe, delete_recipe, add_comment, add_reply, delete_comment, rate_recipe
+    edit_recipe, delete_recipe, add_comment, delete_comment, rate_recipe
 )
 
 app_name = 'recipes'
@@ -19,7 +19,7 @@ urlpatterns = [
 
     # Comments
     path("recipe/<slug:slug>/comment/", add_comment, name="add_comment"),
-    path("recipe/<slug:slug>/comment/<int:parent_id>/reply/", add_reply, name="add_reply"),
+    path("recipe/<slug:slug>/comment/<int:parent_id>/reply/", add_comment, name="add_reply"),
     path("recipe/<slug:slug>/comment/<int:comment_id>/delete/", delete_comment, name="delete_comment"),
 
     path("<slug:slug>/", recipe_detail, name="recipe_detail"),

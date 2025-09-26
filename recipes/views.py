@@ -15,9 +15,10 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.shortcuts import redirect
-from comments.forms import CommentForm, ReplyForm
+from comments.forms import CommentForm
 from comments.models import Comment
 from ratings.models import Rating
+from django.template.loader import render_to_string
 
 User = get_user_model()
 
@@ -53,6 +54,7 @@ def recipe_detail(request, slug):
     nut_v = getattr(recipe, "nutritional_value", None)
 
     comments = recipe.comments.select_related('author').order_by('-created_at')
+    comment_form = CommentForm()
 
     # Split by new lines
     ingredients = recipe.ingredients.split("\n") if recipe.ingredients else []
@@ -62,7 +64,7 @@ def recipe_detail(request, slug):
     ingredients = [ing.strip() for ing in ingredients if ing.strip()]
     instructions = [inst.strip() for inst in instructions if inst.strip()]
 
-    return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "nut_v": nut_v, "ingredients": ingredients, "instructions": instructions, "comments": comments},)
+    return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "nut_v": nut_v, "ingredients": ingredients, "instructions": instructions, "comments": comments, "comment_form": comment_form},)
 
 def upload_recipe(request):
     """
@@ -90,7 +92,7 @@ def upload_recipe(request):
                 prep_time=cleaned['prep_time'],
             )
 
-            messages.success(request, "Recipe Uploaded Succesfully!")
+            messages.success(request, "Recipe Uploaded Successfully!")
             return redirect('recipes:recipe_detail', slug=recipe.slug)
         else:
             messages.error(request, "Error:")
@@ -146,47 +148,55 @@ def delete_recipe(request, slug):
     return redirect('accounts:profile_view')
 
 @login_required
-def add_comment(request, slug):
+def add_comment(request, slug, parent_id=None):
     """
-    View to add comments
+    View to add comments, and replies via AJAX.
+    If parent_id=None, it becomes a top-level comment else reply.
     """
     recipe = get_object_or_404(Recipe, slug=slug)
+    parent = None
+    if parent_id:
+        parent = get_object_or_404(Comment, id=parent_id, recipe=recipe)
+
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
             comment.recipe = recipe
             comment.author = request.user
+            comment.parent = parent
             comment.save()
-            messages.success(request, "Comment added!")
-        else:
-            messages.error(request, "Please correct the errors below")
-    else:
-        form = CommentForm()
 
-    return render(request, "recipes/recipe_detail.html", {"recipe": recipe, "comment_form": form})
-
-@login_required
-def add_reply(request, slug, parent_id):
-    """
-    Allows users to reply to comments
-    """
-    recipe = get_object_or_404(Recipe, slug=slug)
-    parent = get_object_or_404(Comment, id=parent_id, recipe=recipe)
-    if request.method == 'POST':
-        form = ReplyForm(request.POST)
-        if form.is_valid():
-            reply = form.save(commit=False)
-            reply.recipe = recipe
-            reply.author = request.user
-            reply.parent = parent
-            reply.save()
-            messages.success(request, "Reply added!")
-            return redirect("recipe_detail", pk=recipe.id)
+            # Render in HTML fragment
+            html = render_to_string("recipes/_comment.html", {"comment": comment}, request=request)
+            return JsonResponse({"success": True, "html": html})
         else:
-            messages.error(request, "Please correct the error below.")
+            return JsonResponse({"success": False, "errors": form.errors}, status=400)    
+
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)
+        
+# @login_required
+# def add_reply(request, slug, parent_id):
+#     """
+#     Refactored in add_reply
+#     Allows users to reply to comments
+#     """
+#     recipe = get_object_or_404(Recipe, slug=slug)
+#     parent = get_object_or_404(Comment, id=parent_id, recipe=recipe)
+#     if request.method == 'POST':
+#         form = ReplyForm(request.POST)
+#         if form.is_valid():
+#             reply = form.save(commit=False)
+#             reply.recipe = recipe
+#             reply.author = request.user
+#             reply.parent = parent
+#             reply.save()
+#             messages.success(request, "Reply added!")
+#             return redirect("recipe_detail", pk=recipe.id)
+#         else:
+#             messages.error(request, "Please correct the error below.")
     
-    return redirect('recipes:recipe_detail', slug=slug)
+#     return redirect('recipes:recipe_detail', slug=slug)
 
 @login_required
 def delete_comment(reques, slug, comment_id):

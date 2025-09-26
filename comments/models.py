@@ -34,4 +34,4 @@ class Comment(models.Model):
         return self.parent is not None
 
     def __str__(self):
-        return f"Comment by {self.user.username}"
+        return f"Comment by {self.author.username}"
