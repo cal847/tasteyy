@@ -43,11 +43,13 @@ class Recipe(models.Model):
     api_id = models.PositiveIntegerField(
         help_text="ID from Spoonacular", null=True, blank=True
     )
+
     diet = ArrayField(models.CharField(max_length=20, choices=DIET_CHOICES, default=list))
     title = models.TextField()
     slug = models.SlugField(unique=True, blank=True, max_length=500)
     description = models.TextField(blank=True, null=True)
     extra_tips = models.TextField(blank=True, null=True)
+
     servings = models.PositiveIntegerField()
     ingredients = models.TextField(blank=True, null=True)
     image = models.ImageField(upload_to="recipes/", blank=True, null=True)

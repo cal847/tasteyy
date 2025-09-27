@@ -4,6 +4,7 @@ from .views import (
     RecipeViewSet, search_recipes, upload_recipe, recipe_detail,
     edit_recipe, delete_recipe, add_comment, delete_comment, rate_recipe
 )
+from .views import RecipeViewSet, search_recipes
 
 app_name = 'recipes'
 

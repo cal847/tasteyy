@@ -19,6 +19,9 @@ from comments.forms import CommentForm
 from comments.models import Comment
 from ratings.models import Rating
 from django.template.loader import render_to_string
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.core.paginator import Paginator
 
 User = get_user_model()
 
@@ -243,6 +246,13 @@ def rate_recipe(request, slug):
             messages.error(request, "Invalid rating. Please pick between -5 and 5.")
 
     return redirect("recipes:recipe_detail", slug=recipe.slug)
+# def recipe_list(request):
+#     """
+#     Renders recipes
+#     """
+    
+
+#     return render(request, "recipes/recipe_list.html", {"recipes": recipes})
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """Determines permissions of users"""

@@ -237,7 +237,6 @@
                 <a href="?page=1" class="pagination-link">First</a>
                 <a href="?page={{ recipes.previous_page_number }}" class="pagination-link">Previous</a>
             {% endif %}
-
             <!-- Show page numbers around current page -->
             {% for num in recipes.paginator.page_range %}
                 {% if num == recipes.number %}

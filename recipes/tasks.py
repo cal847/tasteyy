@@ -11,7 +11,6 @@ API_URL = "https://api.spoonacular.com/recipes/complexSearch"
 RECIPE_INFO_URL = "https://api.spoonacular.com/recipes/{id}/information"
 API_KEY = settings.SPOONACULAR_API_KEY
 
-
 @shared_task(bind=True, max_retries=3)
 def fetch_recipes(self, offset=0, batch_size=10):
     """Fetches recipes from Spoonacular and saves them into DB"""
@@ -27,6 +26,17 @@ def fetch_recipes(self, offset=0, batch_size=10):
     except ValueError:
         cache.set(cache_key, 1, 86400)
         calls_used = 1
+
+    if calls_used > daily_limit:
+        return f"Daily limit reached: {calls_used}/{daily_limit}"
+
+    recipes_per_call = 100
+    daily_limit = 50
+
+    #prevent reaching api call limit
+    today = date.today()
+    cache_key = f"spoonacular_calls_{today}"
+    calls_used = cache.get(cache_key, 0)
 
     if calls_used > daily_limit:
         return f"Daily limit reached: {calls_used}/{daily_limit}"
