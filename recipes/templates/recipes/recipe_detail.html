@@ -136,6 +136,7 @@
                         {% csrf_token %}
                         {{ comment_form.content }}
                         {{ comment_form.non_field_errors }}
+                        <input type="hidden" id="comment-parent-id" name="parent" value="">
                         <button type="submit" class="btn-comment"><i class="fa-solid fa-paper-plane"></i></button>
                     </form>
             </div>

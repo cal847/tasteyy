@@ -57,9 +57,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // COMMENTS AJAX SUBMIT
     const commentForm = document.getElementById('comment-form');
+    const commentTextarea = commentForm?.querySelector('textarea[name="content"]');
+    const parentInput = document.getElementById('comment-parent-id');
+    
+    // Set initial placeholder
+    if (commentTextarea) {
+        commentTextarea.placeholder = "Write a comment...";
+    }
+
+    // Handle reply button clicks
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('reply-toggle')) {
+            const commentEl = e.target.closest('.comment');
+            const author = commentEl.dataset.authorUsername;
+            const commentId = commentEl.dataset.commentId;
+            
+            parentInput.value = commentId;
+            commentTextarea.placeholder = `Replying to @${author}...`;
+            commentTextarea.focus();
+        }
+    });
+
+    // Handle form submission
     if (commentForm) {
-        commentForm.addEventListener('submit', function (e) {
-            // Check if user is a guest
+        commentForm.addEventListener('submit', function(e) {
+            // Guest users: show modal
             if (commentForm.hasAttribute('data-guest')) {
                 e.preventDefault();
                 document.getElementById('auth-modal').style.display = 'flex';
@@ -67,34 +89,48 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             e.preventDefault();
-            const url = commentForm.getAttribute('data-url');
-            const formData = new FormData(commentForm);
+            const url = parentInput.value 
+                ? commentForm.dataset.url.replace(/\/comment\/$/, `/comment/${parentInput.value}/reply/`)
+                : commentForm.dataset.url;
 
+            const formData = new FormData(commentForm);
+            
             fetch(url, {
                 method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success && data.comment_html) {
-                    // Prepend new comment
-                    const commentList = document.getElementById('comment-list');
-                    commentList.insertAdjacentHTML('afterbegin', data.comment_html);
-                    commentForm.reset();
-                } else if (data.error) {
-                    alert(data.error);
+                if (data.success && data.html) {
+                    const parentId = parentInput.value;                    
+
+                    // Reset form
+                    commentTextarea.value = '';
+                    parentInput.value = '';
+                    commentTextarea.placeholder = "Share your thoughts...";
+
+                    // Insert comment in correct place
+                    if (parentId) {
+                        // Find parent and append to its replies
+                        const parentComment = document.querySelector(`.comment[data-comment-id="${parentInput.value}"]`);
+                        if (parentComment) {
+                            const repliesDiv = parentComment.querySelector('.replies');
+                            repliesDiv.insertAdjacentHTML('beforeend', data.html);
+                        }
+                    } else {
+                        // Add to top of main comment list
+                        document.getElementById('comment-list').insertAdjacentHTML('afterbegin', data.html);
+                    }
                 }
             })
-            .catch(() => {
-                alert('Error submitting comment.');
+            .catch(err => {
+                console.error('Comment error:', err);
+                alert('Failed to post comment. Please try again.');;
             });
         });
     }
 
-    // Close modal when clicking X or outside
+    // Close modal
     document.addEventListener('click', function(e) {
         const modal = document.getElementById('auth-modal');
         if (e.target.classList.contains('close-modal') || e.target === modal) {

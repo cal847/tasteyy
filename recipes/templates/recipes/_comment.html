@@ -1,4 +1,4 @@
-<div class="comment" id="comment-{{ comment.id }}">
+<div class="comment" id="comment-{{ comment.id }}" data-comment-id="{{ comment.id }}" data-author-username="{{ comment.author.username }}">
     <p><b>{{ comment.author }}</b>: {{ comment.content }}</p>
     <small>{{ comment.created_at|timesince }} ago</small>
 
