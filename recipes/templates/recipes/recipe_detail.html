@@ -22,94 +22,13 @@
 
     <div class="details-wrapper">
         <div class="rating-container">
-            {% if recipe.avg_rating %}
-                <div class="star-rating" data-rating="{{ recipe.avg_rating }}">
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                </div>
-                <span class="rating-text">({{ recipe.avg_rating|floatformat:1 }})</span>
-            {% else %}
-                <div class="star-rating" data-rating="0">
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                    <div class="star">
-                        <svg class="star-outline" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                        <svg class="star-fill" viewBox="0 0 24 24">
-                            <path d="M12,2L15.09,8.26L22,9.27L17,14.14L18.18,21.02L12,17.77L5.82,21.02L7,14.14L2,9.27L8.91,8.26L12,2Z"/>
-                        </svg>
-                    </div>
-                </div>
-            {% endif %}
+            <div class="star-rating" data-rating="{{ recipe.avg_rating|default:0 }}">
+                {% include "recipes/_star.html" %}
+                {% include "recipes/_star.html" %}
+                {% include "recipes/_star.html" %}
+                {% include "recipes/_star.html" %}
+                {% include "recipes/_star.html" %} 
+            </div>        
             <p>({{ recipe.total_ratings }})</p>
         </div>
         <p> {{ recipe.display_category }}</p>
@@ -209,105 +128,60 @@
                         <p>Be the first to comment!!</p>
                     {% endfor %}
                 </div>
-                <form id="comment-form" data-url="{% url 'recipes:add_comment' recipe.slug %}" method="post">
-                    {% csrf_token %}
-                    {{ comment_form.content }}
-                    {{ comment_form.non_field_errors }}
-                    <button type="submit"><i class="fa-solid fa-paper-plane"></i></button>
-                </form>
+                    <form id="comment-form"
+                    data-url="{% url 'recipes:add_comment' recipe.slug %}"
+                    method="post"
+                    {% if not user.is_authenticated %}data-guest="true"{%endif%}
+                    >
+                        {% csrf_token %}
+                        {{ comment_form.content }}
+                        {{ comment_form.non_field_errors }}
+                        <button type="submit" class="btn-comment"><i class="fa-solid fa-paper-plane"></i></button>
+                    </form>
+            </div>
+            <!-- Authentication Required Modal -->
+            <div id="auth-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <h3>Authentication Required</h3>
+                    <p>You need to be logged in to comment.</p>
+                    <a href="{% url 'accounts:login' %}" class="btn-login">Log In</a>
+                </div>
             </div>
                 
             <!-- Ratings Section -->
             <div class="ratings">
                 <h1>Ratings</h1>
+                
+                <!-- Star-based rating input (supports -5 to +5) -->
+                <div class="star-rating-input" data-rating="0">
+                    <!-- We'll generate 11 "star" slots: -5 to +5 -->
+                    <!-- But visually, we'll show them as a single row with color logic -->
+                    <div class="star negative" data-value="-5"></div>
+                    <div class="star negative" data-value="-4"></div>
+                    <div class="star negative" data-value="-3"></div>
+                    <div class="star negative" data-value="-2"></div>
+                    <div class="star negative" data-value="-1"></div>
+                    <div class="star neutral" data-value="0"></div>
+                    <div class="star positive" data-value="1"></div>
+                    <div class="star positive" data-value="2"></div>
+                    <div class="star positive" data-value="3"></div>
+                    <div class="star positive" data-value="4"></div>
+                    <div class="star positive" data-value="5"></div>
+                </div>
+
+                <!-- Hidden input for form submission -->
+                <input type="hidden" name="rating" id="rating-input" value="0">
+                
+                <!-- Optional: show live numeric value -->
+                <div class="rating-value-display">
+                    Rating: <span id="live-rating">0.0</span>
+                </div>
+
+                <button type="submit" id="submit-rating-btn">Submit Rating</button>
             </div>
         </div>
     </div>
 </div>
-<script>
-    // Initialize star ratings when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        const starRatings = document.querySelectorAll('.star-rating');
-        
-        starRatings.forEach(container => {
-            const rating = parseFloat(container.getAttribute('data-rating')) || 0;
-            const stars = container.querySelectorAll('.star');
-            
-            stars.forEach((star, index) => {
-                const starNumber = index + 1;
-                const fillElement = star.querySelector('.star-fill');
-                
-                if (rating >= starNumber) {
-                    // Full star
-                    fillElement.style.clipPath = 'inset(0 0% 0 0)';
-                } else if (rating > starNumber - 1) {
-                    // Partial star
-                    const fillPercentage = (rating - (starNumber - 1)) * 100;
-                    fillElement.style.clipPath = `inset(0 ${100 - fillPercentage}% 0 0)`;
-                } else {
-                    // Empty star
-                    fillElement.style.clipPath = 'inset(0 100% 0 0)';
-                }
-            });
-        });
-
-        // AJAX to prevent page refresh when a comment is added
-        const commentForm = document.getElementById("comment-form");
-        if (commentForm) {
-            commentForm.addEventListener("submit", function (e) {
-                e.preventDefault();
-                postForm(commentForm, "#comment-list", true);
-            });
-        }
-
-        // Handle reply forms
-        document.body.addEventListener("submit", function (e) {
-            if (e.target.classList.contains("reply-form")) {
-                e.preventDefault();
-                const form = e.target;
-                const repliesDiv = form.closest(".comment").querySelector(".replies");
-                postForm(form, repliesDiv, false);
-            }
-        });
-
-        // Toggle reply form
-        document.body.addEventListener("click", function (e) {
-            if (e.target.classList.contains("reply-toggle")) {
-                const form = e.target.parentElement.querySelector(".reply-form");
-                form.style.display = form.style.display === "none" ? "block" : "none";
-            }
-        });
-
-        function postForm(form, targetSelector, prepend) {
-            const url = form.dataset.url;
-            const data = new FormData(form);
-
-            fetch(url, {
-                method: "POST",
-                headers: {"X-CSRFToken": data.get("csrfmiddlewaretoken")},
-                body: data,
-            })
-            .then(res => res.json())
-            .then(json => {
-                if (json.success) {
-                    if (prepend) {
-                        document.querySelector(targetSelector).insertAdjacentHTML("afterbegin", json.html);
-                    } else {
-                        targetSelector.insertAdjacentHTML("beforeend", json.html);
-                    }
-                    form.reset();
-
-                    // Only hide reply forms, not the main form
-                    if (form.classList.contains("reply-form")) {
-                        form.style.display = "none";
-                    }
-                    
-                }
-            })
-            .catch(err => console.error(err));
-        }
-
-    });
-</script>
-
+<script src="{% static 'recipes/js/recipes.js' %}"></script>
 {% endblock %}

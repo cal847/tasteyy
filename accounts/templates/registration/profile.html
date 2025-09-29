@@ -50,12 +50,11 @@
                 <h3>Confirm Delete</h3>
                 <p id="modal-message"></p>
                 <div class="modal-actions">
-                <button id="cancelBtn" class="btn cancel">Cancel</button>
-                <form id="deleteForm" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn danger">Delete</button>
-                </form>
-                <!-- <a id="confirmDelete" href="#" class="btn danger">Delete</a> -->
+                    <button id="cancelBtn" class="btn cancel">Cancel</button>
+                    <form id="deleteForm" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn danger">Delete</button>
+                    </form>
                 </div>
             </div>
         </div>

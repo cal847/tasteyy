@@ -2,7 +2,7 @@ from rest_framework import viewsets, status, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Recipe
 from ratings.models import Rating
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Case, When, FloatField
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -21,22 +21,32 @@ from ratings.models import Rating
 from django.template.loader import render_to_string
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.db import models
 from django.core.paginator import Paginator
 
 User = get_user_model()
 
 def home(request):
-    queryset = Recipe.objects.annotate(avg_rating=Avg("ratings__rating"))
+    base_queryset = Recipe.objects.annotate(
+        avg_rating=Case(
+            When(ratings__isnull=True, then=0.0),
+            default=Avg("ratings__rating"),
+            output_field=FloatField()
+        ),
+        total_ratings=Count("ratings")
+    )
 
-    top_recipes = Recipe.objects.annotate(avg_rating=Avg("ratings__rating")).order_by("-avg_rating")[:4]
+    queryset = base_queryset.order_by('-created_at')
+    # Sort by avg_rating DESC, but put 0.0-rated recipes LAST
+    top_recipes = base_queryset.order_by("-avg_rating", "-total_ratings")[:4]
 
-    #4 recipes per page
     paginator = Paginator(queryset, 4)
+    recipes = paginator.get_page(request.GET.get("page"))
 
-    page_number = request.GET.get("page")
-    recipes = paginator.get_page(page_number)
-
-    return render(request, "recipes/recipe_list.html", {"recipes": recipes, "top_recipes": top_recipes})
+    return render(request, "recipes/recipe_list.html", {
+        "recipes": recipes,
+        "top_recipes": top_recipes
+    })
 
 def search_recipes(request):
     """
@@ -202,7 +212,7 @@ def add_comment(request, slug, parent_id=None):
 #     return redirect('recipes:recipe_detail', slug=slug)
 
 @login_required
-def delete_comment(reques, slug, comment_id):
+def delete_comment(request, slug, comment_id):
     """
     Allows authors to delete their comments
     """
@@ -233,19 +243,40 @@ def rate_recipe(request, slug):
             # Update if user already rated, otherwise create new
             rating, created = Rating.objects.update_or_create(
                 recipe=recipe,
-                user=request.user,
-                defaults={"value": value},
+                author=request.user,
+                defaults={"rating": value},
             )
 
-            if created:
-                messages.success(request, f"You rated {recipe.title} with {value}.")
-            else:
-                messages.success(request, f"Your rating for {recipe.title} was updated to {value}.")
+            avg_rating = recipe.ratings.aggregate(avg=Avg("rating"))["avg"] or 0.0
+            total_ratings = recipe.ratings.count()
+
+            # Use Json Format for the response instead of html
+            return JsonResponse({
+                "success": True,
+                "message": f"Recipe rated Successfully",
+                "new_rating": value,
+                "avg_rating": round(avg_rating, 1),
+                "total_ratings": total_ratings,
+            });
 
         except (ValueError, TypeError):
-            messages.error(request, "Invalid rating. Please pick between -5 and 5.")
+            return JsonResponse({
+                "success": False,
+                "message": "Invalid rating. Please pick between -5 and 5."
+            }, status=400)
 
-    return redirect("recipes:recipe_detail", slug=recipe.slug)
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=400)            
+
+        #     if created:
+        #         messages.success(request, f"You rated {recipe.title} with {value}.")
+        #     else:
+        #         messages.success(request, f"Your rating for {recipe.title} was updated to {value}.")
+
+        # except (ValueError, TypeError):
+        #     messages.error(request, "Invalid rating. Please pick between -5 and 5.")
+
+    # return redirect("recipes:recipe_detail", slug=recipe.slug)
+
 # def recipe_list(request):
 #     """
 #     Renders recipes
