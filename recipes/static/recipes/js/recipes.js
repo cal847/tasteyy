@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Reset form
                     commentTextarea.value = '';
-                    parentInput.value = '';
+                    parentId.value = '';
                     commentTextarea.placeholder = "Share your thoughts...";
 
                     // Insert comment in correct place
