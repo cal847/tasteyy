@@ -10,7 +10,8 @@ class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rating
-        fields = ["id", "user", "user_id", "recipe", "rating", "comment", "created_at", "updated_at",  "average_rating"]
+        fields = ["id", "user", "user_id", "recipe", "rating", "created_at", "updated_at"]
+        read_only_fields = ['user'] 
 
     def get_average_rating(self, obj):
         return round(obj.avg_rating, 1) if avg_rating else None

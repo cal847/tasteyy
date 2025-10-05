@@ -7,4 +7,4 @@ router.register(r'', RatingViewSet)
 
 urlpatterns = [
         path('', include(router.urls))
-        ]
+]

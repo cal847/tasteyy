@@ -145,7 +145,7 @@
                 <div class="modal-content">
                     <span class="close-modal">&times;</span>
                     <h3>Authentication Required</h3>
-                    <p>You need to be logged in to comment.</p>
+                    <p id="auth-modal-message"></p>
                     <a href="{% url 'accounts:login' %}" class="btn-login">Log In</a>
                 </div>
             </div>
@@ -153,36 +153,48 @@
             <!-- Ratings Section -->
             <div class="ratings">
                 <h1>Ratings</h1>
-                
-                <!-- Star-based rating input (supports -5 to +5) -->
-                <div class="star-rating-input" data-rating="0">
-                    <!-- We'll generate 11 "star" slots: -5 to +5 -->
-                    <!-- But visually, we'll show them as a single row with color logic -->
-                    <div class="star negative" data-value="-5"></div>
-                    <div class="star negative" data-value="-4"></div>
-                    <div class="star negative" data-value="-3"></div>
-                    <div class="star negative" data-value="-2"></div>
-                    <div class="star negative" data-value="-1"></div>
-                    <div class="star neutral" data-value="0"></div>
-                    <div class="star positive" data-value="1"></div>
-                    <div class="star positive" data-value="2"></div>
-                    <div class="star positive" data-value="3"></div>
-                    <div class="star positive" data-value="4"></div>
-                    <div class="star positive" data-value="5"></div>
+
+                <input type="hidden" id="rating-input" value="0">
+                <p>Your rating: <span id="live-rating">0</span></p>
+
+                <div class="star-rating-input">
+                    <span class="star" data-value="1">
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-solid fa-star star-filled"></i>
+                    </span>
+                    <span class="star" data-value="2">
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-solid fa-star star-filled"></i>
+                    </span>
+                    <span class="star" data-value="3">
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-solid fa-star star-filled"></i>
+                    </span>
+                    <span class="star" data-value="4">
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-solid fa-star star-filled"></i>
+                    </span>
+                    <span class="star" data-value="5">
+                        <i class="fa-regular fa-star"></i>
+                        <i class="fa-solid fa-star star-filled"></i>
+                    </span>
                 </div>
 
-                <!-- Hidden input for form submission -->
-                <input type="hidden" name="rating" id="rating-input" value="0">
-                
-                <!-- Optional: show live numeric value -->
-                <div class="rating-value-display">
-                    Rating: <span id="live-rating">0.0</span>
-                </div>
-
-                <button type="submit" id="submit-rating-btn">Submit Rating</button>
+                <button type="button" id="submit-rating-btn">Submit Rating</button>
             </div>
         </div>
     </div>
+    <div id="pop-up"> 
+        <span class="popup-message"></span>
+        <span class="close-modal">&times;</span>
+    </div>
 </div>
+<script>
+    window.recipeConfig = {
+        isAuthenticated: {{ user.is_authenticated|yesno:"true,false" }},
+        rateUrl: "{% url 'recipes:rate_recipe' recipe.slug %}",
+        csrfToken: "{{ csrf_token }}"
+    };
+</script>
 <script src="{% static 'recipes/js/recipes.js' %}"></script>
 {% endblock %}

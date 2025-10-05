@@ -1,4 +1,17 @@
 // This script enables interactive star rating and comment AJAX for recipe_detail.html
+
+// Shows a notification when users submit a rating
+function showPopup(message, duration = 2500) {
+    const popup = document.getElementById('pop-up');
+    const msg = document.getElementById('popup-message');
+
+    msg.textContent = message;
+    popup.style.display = 'flex'
+
+    const hideTimer = setTimeout(() => {
+        popup.style.display = 'none';
+    }, duration);
+}
 document.addEventListener('DOMContentLoaded', function () {
     // STAR RATING INPUT (supports -5 to +5)
     const starRatingInput = document.querySelector('.star-rating-input');
@@ -28,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // Optional: show hover preview
+        // Show hover preview
         stars.forEach(star => {
             star.addEventListener('mouseenter', function () {
                 const value = parseInt(this.getAttribute('data-value'));
@@ -50,8 +63,34 @@ document.addEventListener('DOMContentLoaded', function () {
         // Handle rating submission (AJAX or form POST)
         submitRatingBtn.addEventListener('click', function (e) {
             e.preventDefault();
-            // TODO: Implement AJAX POST or submit form with ratingInput.value
-            alert('Rating submitted: ' + ratingInput.value);
+                
+            if (!window.recipeConfig.isAuthenticated) {
+                document.getElementById('auth-modal-message').textContent = 'You need to be logged in to rate.';
+                document.getElementById('auth-modal').style.display = 'flex';
+                return;
+            }
+                            
+            const rating = ratingInput.value;
+            const formData = new FormData()
+            formData.append('rating', rating);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+            fetch(window.recipeConfig.rateUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showPopup('Rating Submitted!!');
+                } else {
+                    showPopup('Error:' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showPopup('Failed to submit rating', 3000)
+            })
         });
     }
 
@@ -84,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Guest users: show modal
             if (commentForm.hasAttribute('data-guest')) {
                 e.preventDefault();
+                document.getElementById('auth-modal-message').textContent = 'You need to be logged in to comment'
                 document.getElementById('auth-modal').style.display = 'flex';
                 return;
             }
@@ -129,12 +169,18 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+    
 
     // Close modal
     document.addEventListener('click', function(e) {
         const modal = document.getElementById('auth-modal');
         if (e.target.classList.contains('close-modal') || e.target === modal) {
             modal.style.display = 'none';
+        }
+
+        const popup = document.getElementById('pop-up');
+        if (e.target.classList.contains('close-popup') || e.target === popup) {
+            popup.style.display = 'none';
         }
     });
 });
