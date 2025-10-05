@@ -581,7 +581,16 @@
     /* border: 4px solid blue; */
 }
 
-.star .star-filled {
+.star i {
+    color: rgb(6, 80, 6);
+}
+
+.star.filled i,
+.star.hovering i {
+    color: rgb(6, 80, 6); /* your green */
+}
+
+/* .star .star-filled {
     color: rgb(6, 80, 6);
     position: absolute;
     top: 0;
@@ -593,7 +602,7 @@
 .star.hovered .star-filled,
 .star.selected .star-filled {
     opacity: 1;
-}
+} */
 
 /* ===== BUTTONS ===== */
 .btn, .btn-reply {

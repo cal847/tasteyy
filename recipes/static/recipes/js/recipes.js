@@ -25,9 +25,9 @@ document.addEventListener('DOMContentLoaded', function () {
         function updateStars(selectedValue) {
             stars.forEach(star => {
                 const value = parseInt(star.getAttribute('data-value'));
-                star.classList.remove('selected');
-                if (value === selectedValue) {
-                    star.classList.add('selected');
+                star.classList.remove('filled', 'hovering');
+                if (value <= selectedValue) {
+                    star.classList.add('filled');
                 }
             });
             ratingInput.value = selectedValue;
@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', function () {
             star.addEventListener('mouseenter', function () {
                 const value = parseInt(this.getAttribute('data-value'));
                 stars.forEach(s => {
-                    s.classList.remove('hovered');
+                    s.classList.remove('hovering');
                     if (parseInt(s.getAttribute('data-value')) === value) {
-                        s.classList.add('hovered');
+                        s.classList.add('hovering');
                     }
                 });
             });
             star.addEventListener('mouseleave', function () {
-                stars.forEach(s => s.classList.remove('hovered'));
+                stars.forEach(s => s.classList.remove('hovering'));
             });
         });
 
