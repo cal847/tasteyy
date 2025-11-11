@@ -587,7 +587,7 @@
 
 .star.filled i,
 .star.hovering i {
-    color: rgb(6, 80, 6); /* your green */
+    color: rgb(0, 51, 0); /* your green */
 }
 
 /* .star .star-filled {
